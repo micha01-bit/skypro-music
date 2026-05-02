@@ -16,7 +16,7 @@ export default function Bar() {
                   <use xlinkHref="/img/icon/sprite.svg#icon-prev"></use>
                 </svg>
               </div>
-              <div className={'player__btnPlay btn'}>
+              <div className={classnames(styles.player__btnPlay, styles.btn)}>
                 <svg className={styles.player__btnPlaySvg}>
                   <use xlinkHref="/img/icon/sprite.svg#icon-play"></use>
                 </svg>
