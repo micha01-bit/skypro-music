@@ -60,4 +60,9 @@
   font-weight: 400;
   font-size: 16px;
   line-height: 24px;
+} 
+ 
+.theme__image {
+  color: #181818;
+  cursor: pointer;
 }
