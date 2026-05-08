@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Montserrat } from 'next/font/google';
-import './globals.css';
+import './globals.css'; 
+import ReduxProvider from '@/store/ReduxProvider';
 
 const montserrat = Montserrat({
   variable: '--font-montserrat',
@@ -17,9 +18,12 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
-    <html lang="en" className={`${montserrat.variable}`}>
+  return ( 
+    <ReduxProvider>
+    <html lang="en" 
+     className={`${montserrat.variable}`}>
       <body>{children}</body>
-    </html>
+    </html> 
+    </ReduxProvider>
   );
 }
