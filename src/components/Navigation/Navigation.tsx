@@ -1,8 +1,17 @@
+'use client' 
+    
 import styles from './navigation.module.css'; 
 import Image from 'next/image'; 
-import Link from 'next/link';  
+import Link from 'next/link'; 
+import { useState } from 'react';  
   
-export default function Navigation() {
+export default function Navigation() { 
+  const [isBurgerMenuOpen, setIsBurgerMenuOpen] = useState(false);
+
+  const onOpenBurgerMenu = () => {
+    setIsBurgerMenuOpen(!isBurgerMenuOpen); 
+     } 
+
     return ( 
           <nav className={styles.main__nav}>
             <div className={styles.nav__logo}>
@@ -15,11 +24,14 @@ export default function Navigation() {
                 alt={'logo'}
               />
             </div>
-            <div className={ styles.nav__burger}>
+            <div className={ styles.nav__burger} 
+            onClick={onOpenBurgerMenu} 
+            >
               <span className={styles.burger__line}></span>
               <span className={styles.burger__line}></span>
               <span className={styles.burger__line}></span>
-            </div>
+            </div> 
+          {isBurgerMenuOpen &&
             <div className={styles.nav__menu}>
               <ul className={styles.menu__list}>
                 <li className={styles.menu__item}>
@@ -39,7 +51,8 @@ export default function Navigation() {
                   </Link>
                 </li>
               </ul>
-            </div>
+            </div> 
+            }
           </nav> 
     )
 }

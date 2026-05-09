@@ -7,5 +7,15 @@
   -ms-flex-direction: column;
   flex-direction: column;
   overflow-y: auto; 
-  max-height: calc(100vh - 300px);
+  max-height: calc(100vh - 300px); 
+  padding-right: 8px;
+} 
+
+.content__playlist::-webkit-scrollbar {
+  display: none; /* Для Chrome, Safari, Edge */
+}
+
+.content__playlist {
+  -ms-overflow-style: none;  /* Для IE и Edge */
+  scrollbar-width: none;    /* Для Firefox */
 }
