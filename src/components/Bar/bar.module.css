@@ -358,4 +358,8 @@
     color: #ad61ff;
     cursor: pointer;
   }
+} 
+ 
+.audio {
+  display: none;
 }
