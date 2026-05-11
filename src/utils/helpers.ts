@@ -37,4 +37,13 @@ export function formatTime(time: number) {
   const outputSeconds = inputSeconds < 10 ? `0${inputSeconds}` : `${inputSeconds}`;
 
   return `${minutes}:${outputSeconds}`;
+} 
+ 
+export const getTimePanel = (
+  currentTime: number,
+  totalTime: number | undefined
+) => {
+  if (totalTime) {
+    return `${formatTime(currentTime)} / ${formatTime(totalTime)}`
+  }
 }

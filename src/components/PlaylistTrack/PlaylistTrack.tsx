@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import styles from './playlistTrack.module.css'; 
 import { useAppDispatch, useAppSelector } from '@/store/store';
-import { setCurrentTrack, setIsPlay } from '@/store/features/trackSlice';
+import { setCurrentTrack, setCurrentPlaylist, setIsPlay } from '@/store/features/trackSlice';
 import { TrackType } from '@/sharedTypes/sharedTypes';
 import { formatTime } from '@/utils/helpers';
 import classNames from 'classnames'; 
@@ -14,11 +14,12 @@ type trackTypeProp = {
   // author: string,
   // album: string,
   // time: string 
-  track: TrackType
+  track: TrackType 
+  playlist: TrackType[]
 }
 
 // export default function PlaylistTrack ({ name, author, album, time }: trackProp) { 
-export default function PlaylistTrack({ track }: trackTypeProp) {
+export default function PlaylistTrack({ track, playlist }: trackTypeProp) {
   const dispatch = useAppDispatch();
 
   // получить текущий трек
@@ -35,7 +36,8 @@ export default function PlaylistTrack({ track }: trackTypeProp) {
 
   const onClickTrack = () => {
     dispatch(setCurrentTrack(track));
-    dispatch(setIsPlay(true));
+    dispatch(setIsPlay(true)); 
+    dispatch(setCurrentPlaylist(playlist));
   } 
  
 

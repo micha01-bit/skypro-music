@@ -11,7 +11,6 @@ export default function Filter() {
   const onOpenDropdownList = (title: string) => {
     setIsOpen(title === isOpen ? "" : title); // закрыть список, если он уже открыт
     setActiveFilter(title);
-    // console.log("Открыть список: ", title);
   };  
 
   return (
