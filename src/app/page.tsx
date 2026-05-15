@@ -1,21 +1,23 @@
-import './page.css'; 
-import styles from './page.module.css'; 
-import Bar from '@/components/Bar/Bar'; 
-import Navigation from '@/components/Navigation/Navigation'; 
-import Centerblock from '@/components/Centerblock/Centerblock'; 
-import Sidebar from '@/components/Sidebar/Sidebar'; 
+import './page.css';
+import styles from './page.module.css';
+import Bar from '@/components/Bar/Bar';
+import Navigation from '@/components/Navigation/Navigation';
+import Centerblock from '@/components/Centerblock/Centerblock';
+import Sidebar from '@/components/Sidebar/Sidebar';
 
 export default function Home() {
   return (
     <div className={styles.wrapper}>
       <div className={styles.container}>
         <main className={styles.main}>
-          <Navigation/>
-          <Centerblock/> 
-          <Sidebar/>
-        </main> 
-        <Bar/>
-        <footer className="footer"></footer>
+          <Navigation />
+          <Centerblock />
+          <Sidebar />
+        </main>
+        <div className={styles.barWrapper}>
+          <Bar />
+          <footer className="footer"></footer>
+        </div>
       </div>
     </div>
   );
