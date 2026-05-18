@@ -11,10 +11,10 @@ export default function PlaylistTracks() {
       {data.map((track) => (
         <PlaylistTrack
           key={track._id}
-          track={track}
+          track={track} 
+          playlist={data}
         />
       ))}
     </div>
   );
 }
-

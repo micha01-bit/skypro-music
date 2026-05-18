@@ -1,32 +1,50 @@
 .wrapper {
   width: 100%;
   min-height: 100vh;
-  overflow: hidden;
   background-color: #181818;
-}  
- 
+  display: flex;
+  flex-direction: column;
+}
+
 .container {
   max-width: 1920px;
-  min-height: 100vh;
   margin: 0 auto;
   position: relative;
-  background-color: #181818; 
+  background-color: #181818;
   display: flex;
-  flex-direction: column; 
-  overflow: hidden;
+  flex-direction: column;
+  min-height: calc(100vh - env(safe-area-inset-bottom, 0px));
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 .main {
-  -webkit-box-flex: 1;
-  -ms-flex: 1 1 auto;
-  flex: 1 1 auto;
-  display: -webkit-box;
-  display: -ms-flexbox;
+  flex: 1 0 auto;
   display: flex;
-  -ms-flex-wrap: wrap;
   flex-wrap: wrap;
-  -webkit-box-pack: justify;
-  -ms-flex-pack: justify;
-  justify-content: space-between; 
-  overflow: hidden;
+  justify-content: space-between;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  max-height: calc(100vh - 73px); /* Ограничиваем высоту: весь экран минус высота плеера */
+}
+
+/* Скрываем скроллбары в полноэкранном режиме */
+.main::-webkit-scrollbar {
+  display: none; /* Для Chrome/Safari */
+}
+
+.main {
+  -ms-overflow-style: none;  /* Для IE */
+  scrollbar-width: none;  /* Для Firefox */
+}
+
+.barWrapper {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  z-index: 1000; 
+  background: #181818;
+  padding-bottom: calc(env(safe-area-inset-bottom, 20px) + 10px); /* Безопасный отступ */
+  box-sizing: border-box;
 }

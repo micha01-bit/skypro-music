@@ -22,7 +22,8 @@ export default function RootLayout({
     <ReduxProvider>
     <html lang="en" 
      className={`${montserrat.variable}`}>
-      <body>{children}</body>
+      <body>{children} 
+      </body>
     </html> 
     </ReduxProvider>
   );
