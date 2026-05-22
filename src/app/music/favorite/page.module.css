@@ -1,4 +1,4 @@
-.wrapper {
+/* .wrapper {
   width: 100%;
   min-height: 100vh;
   background-color: #181818;
@@ -24,17 +24,16 @@
   justify-content: space-between;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  max-height: calc(100vh - 73px); /* Ограничиваем высоту: весь экран минус высота плеера */
+  max-height: calc(100vh - 73px); 
 }
 
-/* Скрываем скроллбары в полноэкранном режиме */
 .main::-webkit-scrollbar {
-  display: none; /* Для Chrome/Safari */
+  display: none; 
 }
 
 .main {
-  -ms-overflow-style: none;  /* Для IE */
-  scrollbar-width: none;  /* Для Firefox */
+  -ms-overflow-style: none;  
+  scrollbar-width: none;  
 }
 
 .barWrapper {
@@ -45,6 +44,6 @@
   width: 100%;
   z-index: 1000; 
   background: #181818;
-  padding-bottom: calc(env(safe-area-inset-bottom, 20px) + 10px); /* Безопасный отступ */
+  padding-bottom: calc(env(safe-area-inset-bottom, 20px) + 10px); 
   box-sizing: border-box;
-}
+} */

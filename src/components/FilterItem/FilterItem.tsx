@@ -2,58 +2,55 @@
 
 import classNames from 'classnames';
 import styles from './filterItem.module.css';
-import { data } from '@/data';
 import { useState } from 'react';
-
+import { TrackType } from '@/sharedTypes/sharedTypes';
 
 type titleItemProp = {
-  title: string,
-  onClick: () => void,
-  isOpen: boolean,
-  activeFilter: string
-}
+  title: string;
+  onClick: () => void;
+  isOpen: boolean;
+  activeFilter: string;
+  playlist?: TrackType[];
+};
 
-export default function FilterItem({ title, onClick, isOpen, activeFilter }: titleItemProp) {
-  // console.log("title в компоненте FilterItem: ", title);
-  // console.log("activeFilter в компоненте FilterItem: ", activeFilter);
-  // console.log("isOpen в компоненте FilterItem: ", isOpen);
+export default function FilterItem({
+  title,
+  onClick,
+  isOpen,
+  activeFilter,
+  playlist = []
+}: titleItemProp) {
+  const uniqueAuthors = playlist
+    ? [...new Set(playlist.map(track => track.author))]
+    : [];
 
-  const uniqueAuthors = [...new Set(data.map(track => track.author))];
-  // console.log("uniqueAuthors", uniqueAuthors);
+  const uniqueReleaseYears = playlist
+    ? [...new Set(playlist.map(track => {
+        const date = new Date(track.release_date);
+        return isNaN(date.getTime()) ? null : date.getFullYear();
+      }).filter(year => year !== null))]
+    : [];
 
-  const uniqueReleaseYears = [...new Set(data.map(track => new Date(track.release_date).getFullYear()))];
-  // console.log("uniqueReleaseYears", uniqueReleaseYears);
-
-  const uniqueGenres = [...new Set(data.flatMap(track => track.genre))];
-  // console.log("uniqueGenres", uniqueGenres);
-
-  // let count: number = 0;
-  // if (title === "исполнителю") {
-  //   count = uniqueAuthors.length;
-  // } else if (title === "году выпуска") {
-  //   count = uniqueReleaseYears.length;
-  // } else if (title === "жанру") {
-  //   count = uniqueGenres.length;
-  // }
+  const uniqueGenres = playlist
+    ? [...new Set(playlist.flatMap(track => track.genre || []))]
+    : [];
 
   return (
     <>
-      <div className={
-        // activeFilter && title && isOpen
-        isOpen
-          ?
-          classNames(styles.filter__button, {
-            [styles.active]: activeFilter === title,
-          })
-          :
-          styles.filter__button
-      }
+      <div
+        className={
+          isOpen
+            ? classNames(styles.filter__button, {
+                [styles.active]: activeFilter === title,
+              })
+            : styles.filter__button
+        }
         onClick={() => onClick()}
-      >{title}
-        {isOpen &&
+      >
+        {title}
+        {isOpen && (
           <div className={styles.filter__wrapper}>
             <ul className={styles.filter__list}>
-
               {title === "исполнителю" &&
                 uniqueAuthors.map((author) => (
                   <li className={styles.filter__item} key={author}>
@@ -74,18 +71,10 @@ export default function FilterItem({ title, onClick, isOpen, activeFilter }: tit
                     {genre}
                   </li>
                 ))}
-
             </ul>
           </div>
-        }
-        {/* {isOpen ?
-          <div className={styles.filter__count}>
-            {count}
-          </div>
-          :
-          null
-        } */}
+        )}
       </div>
     </>
-  )
+  );
 }

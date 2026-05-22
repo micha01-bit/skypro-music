@@ -10,6 +10,16 @@
   color: #FFFFFF;
   cursor: pointer;
   position: relative;
+} 
+ 
+.filter__button:hover {
+  border: 1px solid #D9B6FF;
+  color: #D9B6FF;
+}
+
+.filter__button:active {
+  border: 1px solid #AD61FF;
+  color: #AD61FF;
 }
 
 .filter__button:not(:last-child) {

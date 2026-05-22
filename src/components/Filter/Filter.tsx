@@ -2,9 +2,15 @@
   
 import styles from './filter.module.css'; 
 import FilterItem from '../FilterItem/FilterItem';
-import { useState } from 'react';
+import { useState } from 'react'; 
+import { TrackType } from '@/sharedTypes/sharedTypes';
 
-export default function Filter() { 
+ 
+type FilterProp = {
+  playlist: TrackType[]
+}
+ 
+export default function Filter({ playlist }: FilterProp) { 
   const [isOpen, setIsOpen] = useState("");
   const [activeFilter, setActiveFilter] = useState("");
 
