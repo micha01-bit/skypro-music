@@ -1,9 +1,3 @@
-// export default function Signup () {
-//   return (
-//     <h1>Регистрация</h1>
-//   )
-// }
-
 'use client';
 
 

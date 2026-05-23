@@ -10,7 +10,7 @@ type titleItemProp = {
   onClick: () => void;
   isOpen: boolean;
   activeFilter: string;
-  playlist?: TrackType[];
+  playlist: TrackType[];
 };
 
 export default function FilterItem({

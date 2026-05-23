@@ -26,19 +26,22 @@ export default function Filter({ playlist }: FilterProp) {
         title="исполнителю"
         onClick={() => onOpenDropdownList("исполнителю")}
         isOpen={isOpen === "исполнителю"}
-        activeFilter={activeFilter}
+        activeFilter={activeFilter} 
+        playlist={playlist}
         />
       <FilterItem
         title="году выпуска"
         onClick={() => onOpenDropdownList("году выпуска")}
         isOpen={isOpen === "году выпуска"}
-        activeFilter={activeFilter}
+        activeFilter={activeFilter} 
+        playlist={playlist}
         />
       <FilterItem
         title="жанру"
         onClick={() => onOpenDropdownList("жанру")}
         isOpen={isOpen === "жанру"}
-        activeFilter={activeFilter}
+        activeFilter={activeFilter} 
+        playlist={playlist}
       />
     </div>
   )
