@@ -1,3 +1,7 @@
+
+ 
+ 
+   
 export type TrackType = {
   _id: number,
   name: string,
@@ -17,4 +21,4 @@ export type CategoryType = {
   name: string,
 }
 
-export type FavoriteType = []
+export type FavoriteType = [] 
