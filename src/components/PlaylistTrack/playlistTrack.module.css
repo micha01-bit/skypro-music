@@ -103,6 +103,15 @@
   font-size: 16px;
   line-height: 24px;
   color: #696969;
+} 
+ 
+.track__time {
+  display: flex;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 65px;
 }
 
 .track__timeSvg {
@@ -122,11 +131,13 @@
   color: #696969;
 } 
  
-@keyframes bubble_out {
+@keyframes bubble_out { 
+  
   0%,
   to {
     transform: scale(0.5);
-  }
+  } 
+
   50% {
     transform: scale(1);
   }

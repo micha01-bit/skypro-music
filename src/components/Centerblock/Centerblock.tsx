@@ -10,10 +10,13 @@ type CenterblockProp = {
   playlist: TrackType[],
   categoryName?: string,
   isLoading: boolean,
-  error: string
-} 
+  error: string, 
+  isAuthRequired: boolean
+}  
+
  
-export default function Centerblock({ playlist, categoryName, isLoading, error }: CenterblockProp) {
+export default function Centerblock({ playlist, categoryName, isLoading, error, isAuthRequired }: CenterblockProp) { 
+  // console.log("Отфильтрованные треки в Centerblock: ", playlist);
   return (
     <div className={styles.centerblock}>
      <Search/>
@@ -21,7 +24,7 @@ export default function Centerblock({ playlist, categoryName, isLoading, error }
       <Filter playlist={playlist} />
       <div className={styles.centerblock__content}>
         <PlaylistTitle />
-        <PlaylistTracks playlist={playlist} isLoading={isLoading} error={error} />
+        <PlaylistTracks playlist={playlist} isLoading={isLoading} error={error} isAuthRequired={isAuthRequired}/>
       </div>
     </div>
   )
