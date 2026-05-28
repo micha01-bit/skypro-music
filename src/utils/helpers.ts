@@ -46,4 +46,22 @@ export const getTimePanel = (
   if (totalTime) {
     return `${formatTime(currentTime)} / ${formatTime(totalTime)}`
   }
+} 
+ 
+export const checkAccessToken = ():boolean => {
+  // время жизни access токена в секундах
+  const tokenLifetime = 200;
+
+  const tokenGetTime = parseInt(localStorage.getItem("tokenGetTime") || "0", 10);
+  // console.log("Время получения токена из LS в проверке токена: ", tokenGetTime);
+
+  // текущее время в секундах
+  const currentTime = new Date().getTime() / 1000;
+  // console.log("время получения токена в секундах: ", tokenGetTime);
+
+  const isAccessTokenExpired = Math.round(currentTime - tokenGetTime) >= tokenLifetime;
+  // console.log("Разница времени получения токена и текущего времени в секундах в проверке токена: ", Math.round(currentTime - tokenGetTime));
+  // console.log("Access токен истёк? в проверке токена: ", isAccessTokenExpired);
+
+  return isAccessTokenExpired;
 }

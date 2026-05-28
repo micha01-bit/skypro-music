@@ -1,3 +1,7 @@
+
+ 
+ 
+   
 export type TrackType = {
   _id: number,
   name: string,
@@ -8,5 +12,13 @@ export type TrackType = {
   album: string,
   logo: string | null,
   track_file: string,
-  stared_user: string[],
+  staredUser: string[],
+} 
+
+export type CategoryType = {
+  _id: number,
+  items: [],
+  name: string,
 }
+
+export type FavoriteType = [] 
