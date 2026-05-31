@@ -1,7 +1,3 @@
-
- 
- 
-   
 export type TrackType = {
   _id: number,
   name: string,
