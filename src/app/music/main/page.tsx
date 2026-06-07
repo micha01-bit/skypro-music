@@ -1,26 +1,27 @@
 'use client';
 
 import Centerblock from '@/components/Centerblock/Centerblock';
+import { useFetchTracks } from '@/hooks/useFetchTracks';
 import { useAppSelector } from '@/store/store';
-import FetchingTracks from '@/components/FetchingTracks copy/FetchingTracks';
 
 export default function Home() {
-  const { fetchError, fetchIsLoading, allTracks } = useAppSelector((state) => state.tracks);
-  const isAuthRequired = false;
+  useFetchTracks();
+
+  const { allTracks, fetchError, fetchIsLoading } = useAppSelector(
+    (state) => state.tracks
+  );
 
   return (
     <>
-      <FetchingTracks />
       <Centerblock
-        playlist={allTracks}
+        playlist={allTracks} // обязательно передаём playlist
         isLoading={fetchIsLoading}
-        error={fetchError ? fetchError : ''}
-        isAuthRequired={isAuthRequired}
+        error={fetchError || ''}
+        isAuthRequired={false}
       />
     </>
   );
 }
-
 
 
 

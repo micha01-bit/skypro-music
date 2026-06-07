@@ -1,28 +1,25 @@
 'use client';
 
 import Centerblock from '@/components/Centerblock/Centerblock';
+import { useFavoriteTracks } from '@/hooks/useFavoriteTracks';
 import { useAppSelector } from '@/store/store';
-import FetchingFavoriteTracks from '@/components/FetchingFavoriteTracks/FetchingFavoriteTracks';
 
 export default function FavoritePage() {
-  const { favoriteTracks, fetchIsLoading, fetchError } = useAppSelector((state) => state.tracks);
-  const isAuthRequired = true;
+  const { access } = useAppSelector((state) => state.auth);
+  const { favoriteTracks, isLoading, error } = useFavoriteTracks(access);
 
   return (
     <>
-      <FetchingFavoriteTracks />
       <Centerblock
         categoryName="Мои треки"
         playlist={favoriteTracks}
-        isLoading={fetchIsLoading}
-        error={fetchError || ''}
-        isAuthRequired={isAuthRequired}
+        isLoading={isLoading}
+        error={error || ''}
+        isAuthRequired={false}
       />
     </>
   );
 }
-
-
 
 
 
