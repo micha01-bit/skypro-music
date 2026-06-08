@@ -8,11 +8,18 @@ export default function FavoritePage() {
   const { access } = useAppSelector((state) => state.auth);
   const { favoriteTracks, isLoading, error } = useFavoriteTracks(access);
 
+  // Фильтруем треки: убираем null/undefined и дубликаты по _id
+  const filteredTracks = favoriteTracks
+    .filter(track => track && track._id) // проверяем, что трек существует и имеет _id
+    .filter((track, index, array) =>
+      array.findIndex(t => t._id === track._id) === index // убираем дубликаты
+    );
+
   return (
     <>
       <Centerblock
         categoryName="Мои треки"
-        playlist={favoriteTracks}
+        playlist={filteredTracks}
         isLoading={isLoading}
         error={error || ''}
         isAuthRequired={false}
@@ -27,23 +34,58 @@ export default function FavoritePage() {
 // 'use client';
 
 // import Centerblock from '@/components/Centerblock/Centerblock';
+// import { useFavoriteTracks } from '@/hooks/useFavoriteTracks';
 // import { useAppSelector } from '@/store/store';
 
+// export default function FavoritePage() {
+//   const { access } = useAppSelector((state) => state.auth);
+//   const { favoriteTracks, isLoading, error } = useFavoriteTracks(access);
+
+//   // Фильтруем треки: убираем null/undefined и дубликаты по _id
+//   const filteredTracks = favoriteTracks
+//     .filter(track => track && track._id) // проверяем, что трек существует и имеет _id
+//     .filter((track, index, array) =>
+//       array.findIndex(t => t._id === track._id) === index // убираем дубликаты
+//     );
+
+
+//   return (
+//     <>
+//       <Centerblock
+//         categoryName="Мои треки"
+//         playlist={filteredTracks}
+//         isLoading={isLoading}
+//         error={error || ''}
+//         isAuthRequired={false}
+//       />
+//     </>
+//   );
+// }
+
+
+
+
+
+
+// 'use client';
+
+// import Centerblock from '@/components/Centerblock/Centerblock';
+// import { useFavoriteTracks } from '@/hooks/useFavoriteTracks';
+// import { useAppSelector } from '@/store/store';
 
 // export default function FavoritePage() {
-//   const { favoriteTracks, fetchIsLoading, fetchError } = useAppSelector((state) => state.tracks);
-
-//   const isAuthRequired = true;
+//   const { access } = useAppSelector((state) => state.auth);
+//   const { favoriteTracks, isLoading, error } = useFavoriteTracks(access);
 
 //   return (
 //     <>
 //       <Centerblock
 //         categoryName="Мои треки"
 //         playlist={favoriteTracks}
-//         isLoading={fetchIsLoading}
-//         error={fetchError || ''} 
-//         isAuthRequired={isAuthRequired}  
-//         />
+//         isLoading={isLoading}
+//         error={error || ''}
+//         isAuthRequired={false}
+//       />
 //     </>
-//   )
+//   );
 // }

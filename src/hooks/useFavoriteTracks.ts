@@ -4,21 +4,27 @@ import { getFavoriteTracks } from '@/app/services/tracks/trackApi';
 import { useEffect, useState } from 'react';
 import { TrackType } from '@/sharedTypes/sharedTypes';
 import { AxiosError } from 'axios';
-import { useAppDispatch } from '@/store/store';
+import { useAppDispatch, useAppSelector } from '@/store/store';
 import { setFavoriteTracks } from '@/store/features/trackSlice';
 import { reAuth } from '@/utils/reAuth';
-import { useAppSelector } from '@/store/store';
 
 export const useFavoriteTracks = (accessToken: string | null) => {
-  const [favoriteTracks, setFavoriteTracksLocal] = useState<TrackType[]>([]);
+  const [localFavoriteTracks, setLocalFavoriteTracks] = useState<TrackType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const dispatch = useAppDispatch();
   const { refresh } = useAppSelector((state) => state.auth);
+  // Берём текущее состояние из Redux
+  const reduxFavoriteTracks = useAppSelector((state) => state.tracks.favoriteTracks);
+
+  useEffect(() => {
+    // Синхронизируем локальное состояние с Redux при любом изменении
+    setLocalFavoriteTracks(reduxFavoriteTracks);
+  }, [reduxFavoriteTracks]);
 
   useEffect(() => {
     if (!accessToken) {
-      setFavoriteTracksLocal([]);
+      setLocalFavoriteTracks([]);
       setError('Требуется авторизация');
       return;
     }
@@ -28,13 +34,12 @@ export const useFavoriteTracks = (accessToken: string | null) => {
       setError(null);
 
       try {
-        // Используем reAuth для автоматической реавторизации
         const tracks = await reAuth(
           (newToken) => getFavoriteTracks(newToken || accessToken),
           refresh,
           dispatch
         );
-        setFavoriteTracksLocal(tracks);
+        // Обновляем и Redux, и локальное состояние
         dispatch(setFavoriteTracks(tracks));
       } catch (error) {
         if (error instanceof AxiosError) {
@@ -62,7 +67,8 @@ export const useFavoriteTracks = (accessToken: string | null) => {
     fetchFavoriteTracks();
   }, [accessToken, dispatch, refresh]);
 
-  return { favoriteTracks, isLoading, error };
+
+  return { favoriteTracks: localFavoriteTracks, isLoading, error };
 };
 
 
@@ -71,19 +77,26 @@ export const useFavoriteTracks = (accessToken: string | null) => {
 
 // 'use client';
 
-// import { getTracks, getFavoriteTrackIds } from "@/app/services/tracks/trackApi";
-// import { useEffect, useState } from "react";
-// import { TrackType } from "@/sharedTypes/sharedTypes";
-// import { AxiosError } from "axios";
+// import { getFavoriteTracks } from '@/app/services/tracks/trackApi';
+// import { useEffect, useState } from 'react';
+// import { TrackType } from '@/sharedTypes/sharedTypes';
+// import { AxiosError } from 'axios';
+// import { useAppDispatch } from '@/store/store';
+// import { setFavoriteTracks } from '@/store/features/trackSlice';
+// import { reAuth } from '@/utils/reAuth';
+// import { useAppSelector } from '@/store/store';
 
 // export const useFavoriteTracks = (accessToken: string | null) => {
-//   const [favoriteTracks, setFavoriteTracks] = useState<TrackType[]>([]);
+//   const [favoriteTracks, setFavoriteTracksLocal] = useState<TrackType[]>([]);
 //   const [isLoading, setIsLoading] = useState(false);
 //   const [error, setError] = useState<string | null>(null);
+//   const dispatch = useAppDispatch();
+//   const { refresh } = useAppSelector((state) => state.auth);
 
 //   useEffect(() => {
 //     if (!accessToken) {
-//       setFavoriteTracks([]);
+//       setFavoriteTracksLocal([]);
+//       setError('Требуется авторизация');
 //       return;
 //     }
 
@@ -92,18 +105,21 @@ export const useFavoriteTracks = (accessToken: string | null) => {
 //       setError(null);
 
 //       try {
-//         // 1. Получаем все треки
-//         const allTracks = await getTracks();
-//         // 2. Получаем ID избранных треков
-//         const favoriteIds = await getFavoriteTrackIds(accessToken);
-//         // 3. Фильтруем треки по ID
-//         const filteredTracks = allTracks.filter(track =>
-//           favoriteIds.includes(track._id)
+//         // Используем reAuth для автоматической реавторизации
+//         const tracks = await reAuth(
+//           (newToken) => getFavoriteTracks(newToken || accessToken),
+//           refresh,
+//           dispatch
 //         );
-//         setFavoriteTracks(filteredTracks);
+//         setFavoriteTracksLocal(tracks);
+//         dispatch(setFavoriteTracks(tracks));
 //       } catch (error) {
 //         if (error instanceof AxiosError) {
-//           if (error.response) {
+//           if (error.response?.status === 401) {
+//             setError('Требуется повторная авторизация');
+//           } else if (error.response?.status === 404) {
+//             setError('Эндпоинт API не найден. Проверьте URL.');
+//           } else if (error.response) {
 //             setError(error.response.data.message || 'Ошибка сервера');
 //           } else if (error.request) {
 //             setError('Произошла ошибка сети. Проверьте подключение и попробуйте позже');
@@ -121,7 +137,7 @@ export const useFavoriteTracks = (accessToken: string | null) => {
 //     };
 
 //     fetchFavoriteTracks();
-//   }, [accessToken]);
+//   }, [accessToken, dispatch, refresh]);
 
 //   return { favoriteTracks, isLoading, error };
 // };

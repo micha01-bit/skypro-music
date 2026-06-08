@@ -1,83 +1,80 @@
-'use client';
-
-import axios from 'axios';
-import { BASE_URL } from '../constants';
-import { TrackType, CategoryType, FavoriteType } from '@/sharedTypes/sharedTypes';
-
-
-const apiClient = axios.create({
-  baseURL: BASE_URL,
-});
-
+import axios from "axios";
+import { BASE_URL } from "../constants";
+import { TrackType, CategoryType } from "@/sharedTypes/sharedTypes";
 
 export const getTracks = (): Promise<TrackType[]> => {
-  return apiClient
-    .get('/catalog/track/all/')
-    .then((res) => res.data.data)
+  return axios.get(BASE_URL + '/catalog/track/all/')
+    .then((res) => res.data.data as TrackType[])
     .catch((error) => {
-      console.error('Ошибка при получении всех треков:', error);
+      console.error("Ошибка при получении всех треков: ", error);
       throw error;
     });
 };
 
 export const getCategoryTracks = (trackId: string): Promise<CategoryType> => {
-  return apiClient
-    .get(`/catalog/selection/${trackId}/`)
-    .then((res) => res.data.data)
+  return axios.get(BASE_URL + `/catalog/selection/${trackId}/`)
+    .then((res) => res.data.data as CategoryType)
     .catch((error) => {
-      console.error(`Ошибка при получении треков категории ${trackId}:`, error);
+      console.error(`Ошибка при получении категории треков (ID: ${trackId}): `, error);
       throw error;
     });
 };
 
-export const getFavoriteTracks = async (access: string): Promise<FavoriteType> => {
+export const getFavoriteTrackIds = async (access: string): Promise<number[]> => {
   try {
-    const resp = await apiClient.get('/catalog/track/favorite/all/', {
+    const resp = await axios.get(BASE_URL + `/catalog/track/favorite/ids/`, {
       headers: {
         Authorization: `Bearer ${access}`,
       }
     });
-    return resp.data.data;
+    return resp.data.data as number[];
   } catch (error) {
-    console.error("Ошибка при получении треков 'Избранное':", error);
+    console.error("Ошибка при получении ID треков 'Избранное': ", error);
     throw error;
   }
 };
 
-export const addTrackToFavorite = async (trackId: number, accessToken: string) => {
+// Изменён тип возврата: вместо FavoriteType используем TrackType[]
+export const getFavoriteTracks = async (access: string): Promise<TrackType[]> => {
   try {
-    const resp = await apiClient.post(
-      `/catalog/track/${trackId}/favorite/`,
-      {},
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
+    const resp = await axios.get(BASE_URL + `/catalog/track/favorite/all/`, {
+      headers: {
+        Authorization: `Bearer ${access}`,
       }
-    );
-    return resp.data;
+    });
+    return resp.data.data as TrackType[];
   } catch (error) {
-    console.error('Ошибка при добавлении трека в избранное:', error);
+    console.error("Ошибка при получении треков 'Избранное': ", error);
     throw error;
   }
 };
 
-export const deleteTrackFromFavorite = async (
-  trackId: number,
-  accessToken: string
-) => {
+export const addTrackToFavorite = async (trackId: number, accessToken: string): Promise<void> => {
   try {
-    const resp = await apiClient.delete(`/catalog/track/${trackId}/favorite/`, {
+    await axios.post(BASE_URL + `/catalog/track/${trackId}/favorite/`, {}, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
-      },
+      }
     });
-    return resp.data;
   } catch (error) {
-    console.error('Ошибка при удалении трека из избранного:', error);
+    console.error("Ошибка при добавлении трека в избранное: ", error);
     throw error;
   }
 };
+
+export const deleteTrackFromFavorite = async (trackId: number, accessToken: string): Promise<void> => {
+  try {
+    await axios.delete(BASE_URL + `/catalog/track/${trackId}/favorite/`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      }
+    });
+  } catch (error) {
+    console.error("Ошибка при удалении трека из избранного: ", error);
+    throw error;
+  }
+};
+
 
 
 
