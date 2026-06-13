@@ -25,7 +25,8 @@
   flex-direction: column;
   -webkit-box-pack: justify;
   -ms-flex-pack: justify;
-  justify-content: space-between;
+  justify-content: space-between; 
+  cursor: pointer;
 } 
 
 .nav__menu {
@@ -54,7 +55,8 @@
 
 .menu__item {
   padding: 5px 0;
-  margin-bottom: 16px;
+  margin-bottom: 16px; 
+  cursor: pointer;
 }
 
 .menu__link {

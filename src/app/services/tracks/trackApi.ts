@@ -1,88 +1,233 @@
-'use client';
-
 import axios from "axios";
 import { BASE_URL } from "../constants";
-import { TrackType, CategoryType, FavoriteType } from "@/sharedTypes/sharedTypes";
-
+import { TrackType, CategoryType } from "@/sharedTypes/sharedTypes";
 
 export const getTracks = (): Promise<TrackType[]> => {
-  return axios(BASE_URL + '/catalog/track/all/')
-    .then((res) => {
-      // console.log(res.data.data);
-      return res.data.data;
+  return axios.get(BASE_URL + '/catalog/track/all/')
+    .then((res) => res.data.data as TrackType[])
+    .catch((error) => {
+      console.error("Ошибка при получении всех треков: ", error);
+      throw error;
     });
-}
+};
 
 export const getCategoryTracks = (trackId: string): Promise<CategoryType> => {
-  return axios(BASE_URL + `/catalog/selection/${trackId}/`)
-    .then((res) => {
-      // console.log(res.data.data);
-      return res.data.data;
-    })
-}
+  return axios.get(BASE_URL + `/catalog/selection/${trackId}/`)
+    .then((res) => res.data.data as CategoryType)
+    .catch((error) => {
+      console.error(`Ошибка при получении категории треков (ID: ${trackId}): `, error);
+      throw error;
+    });
+};
 
-export const getFavoriteTracks = async (access: string): Promise<FavoriteType> => {
+export const getFavoriteTrackIds = async (access: string): Promise<number[]> => {
+  try {
+    const resp = await axios.get(BASE_URL + `/catalog/track/favorite/ids/`, {
+      headers: {
+        Authorization: `Bearer ${access}`,
+      }
+    });
+    return resp.data.data as number[];
+  } catch (error) {
+    console.error("Ошибка при получении ID треков 'Избранное': ", error);
+    throw error;
+  }
+};
+
+// Изменён тип возврата: вместо FavoriteType используем TrackType[]
+export const getFavoriteTracks = async (access: string): Promise<TrackType[]> => {
   try {
     const resp = await axios.get(BASE_URL + `/catalog/track/favorite/all/`, {
       headers: {
         Authorization: `Bearer ${access}`,
       }
     });
-    // console.log("resp в getFavoriteTracks: ", resp.data.data);
-    return resp.data.data;
+    return resp.data.data as TrackType[];
   } catch (error) {
     console.error("Ошибка при получении треков 'Избранное': ", error);
     throw error;
   }
-}
+};
 
-export const addTrackToFavorite = async (trackId: number, accessToken: string) => {
+export const addTrackToFavorite = async (trackId: number, accessToken: string): Promise<void> => {
   try {
-    const resp = await axios.post(BASE_URL + `/catalog/track/${trackId}/favorite/`, {}, {
+    await axios.post(BASE_URL + `/catalog/track/${trackId}/favorite/`, {}, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       }
     });
-    // console.log("resp в addTrackToFavorite: ", resp.data);
-    return resp.data;
   } catch (error) {
     console.error("Ошибка при добавлении трека в избранное: ", error);
     throw error;
   }
-}
+};
 
-export const deleteTrackFromFavorite = async (trackId: number, accessToken: string) => {
+export const deleteTrackFromFavorite = async (trackId: number, accessToken: string): Promise<void> => {
   try {
-    const resp = await axios.delete(BASE_URL + `/catalog/track/${trackId}/favorite/`, {
+    await axios.delete(BASE_URL + `/catalog/track/${trackId}/favorite/`, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       }
     });
-    // console.log("resp в deleteTrackFromFavorite: ", resp.data);
-    return resp.data;
   } catch (error) {
     console.error("Ошибка при удалении трека из избранного: ", error);
     throw error;
   }
-}
+};
 
-export const refreshAccessToken = async (userRefreshToken: string): Promise<string> => {
-  try {
-    const resp = await axios.post(BASE_URL + '/user/token/refresh/',
-      { refresh: userRefreshToken },
-      {
-        headers: {
-          "content-type": "application/json",
-        }
-      }
-    )
 
-    // console.log("Результат обновления токена: ", resp);
-    // console.log("Новый access token: ", resp.data.access);
 
-    return resp.data.access
-  } catch (error) {
-    console.error("Ошибка при обновлении токена: ", error);
-    throw error;
-  }
-}
+
+
+// import axios from "axios";
+// import { BASE_URL } from "../constants";
+// import { TrackType, CategoryType, FavoriteType } from "@/sharedTypes/sharedTypes";
+
+
+// export const getTracks = (): Promise<TrackType[]> => {
+//   return axios(BASE_URL + '/catalog/track/all/')
+//     .then((res) => {
+//       return res.data.data;
+//     });
+// };
+
+
+// export const getCategoryTracks = (trackId: string): Promise<CategoryType> => {
+//   return axios(BASE_URL + `/catalog/selection/${trackId}/`)
+//     .then((res) => {
+//       return res.data.data;
+//     });
+// };
+
+// export const getFavoriteTrackIds = async (access: string): Promise<number[]> => {
+//   try {
+//     const resp = await axios.get(BASE_URL + `/catalog/track/favorite/ids/`, {
+//       headers: {
+//         Authorization: `Bearer ${access}`,
+//       }
+//     });
+//     return resp.data.data; // Предполагаем, что сервер возвращает массив ID
+//   } catch (error) {
+//     console.error("Ошибка при получении ID треков 'Избранное': ", error);
+//     throw error;
+//   }
+// };
+
+
+// export const getFavoriteTracks = async (access: string): Promise<FavoriteType> => {
+//   try {
+//     const resp = await axios.get(BASE_URL + `/catalog/track/favorite/all/`, {
+//       headers: {
+//         Authorization: `Bearer ${access}`,
+//       }
+//     });
+//     return resp.data.data;
+//   } catch (error) {
+//     console.error("Ошибка при получении треков 'Избранное': ", error);
+//     throw error;
+//   }
+// };
+
+
+// export const addTrackToFavorite = async (trackId: number, accessToken: string) => {
+//   try {
+//     const resp = await axios.post(BASE_URL + `/catalog/track/${trackId}/favorite/`, {}, {
+//       headers: {
+//         Authorization: `Bearer ${accessToken}`,
+//       }
+//     });
+//     return resp.data;
+//   } catch (error) {
+//     console.error("Ошибка при добавлении трека в избранное: ", error);
+//     throw error;
+//   }
+// };
+
+
+// export const deleteTrackFromFavorite = async (trackId: number, accessToken: string) => {
+//   try {
+//     const resp = await axios.delete(BASE_URL + `/catalog/track/${trackId}/favorite/`, {
+//       headers: {
+//         Authorization: `Bearer ${accessToken}`,
+//       }
+//     });
+//     return resp.data;
+//   } catch (error) {
+//     console.error("Ошибка при удалении трека из избранного: ", error);
+//     throw error;
+//   }
+// };
+
+
+
+
+// 'use client';
+
+// import axios from "axios";
+// import { BASE_URL } from "../constants";
+// import { TrackType, CategoryType, FavoriteType } from "@/sharedTypes/sharedTypes";
+
+
+// export const getTracks = (): Promise<TrackType[]> => {
+//   return axios(BASE_URL + '/catalog/track/all/')
+//     .then((res) => {
+//       // console.log(res.data.data);
+//       return res.data.data;
+//     });
+// }
+
+// export const getCategoryTracks = (trackId: string): Promise<CategoryType> => {
+//   return axios(BASE_URL + `/catalog/selection/${trackId}/`)
+//     .then((res) => {
+//       // console.log(res.data.data);
+//       return res.data.data;
+//     })
+// }
+
+// export const getFavoriteTracks = async (access: string): Promise<FavoriteType> => {
+//   try {
+//     const resp = await axios.get(BASE_URL + `/catalog/track/favorite/all/`, {
+//       headers: {
+//         Authorization: `Bearer ${access}`,
+//       }
+//     });
+//     // console.log("resp в getFavoriteTracks: ", resp.data.data);
+//     return resp.data.data;
+//   } catch (error) {
+//     console.error("Ошибка при получении треков 'Избранное': ", error);
+//     throw error;
+//   }
+// }
+
+// export const addTrackToFavorite = async (trackId: number, accessToken: string) => {
+//   try {
+//     const resp = await axios.post(BASE_URL + `/catalog/track/${trackId}/favorite/`, {}, {
+//       headers: {
+//         Authorization: `Bearer ${accessToken}`,
+//       }
+//     }); 
+//     // console.log("Лайкнули трек");
+//     // console.log("resp в addTrackToFavorite: ", resp.data);
+//     return resp.data; 
+//     // return resp;
+//   } catch (error) {
+//     console.error("Ошибка при добавлении трека в избранное: ", error);
+//     throw error;
+//   }
+// }
+
+// export const deleteTrackFromFavorite = async (trackId: number, accessToken: string) => {
+//   try {
+//     const resp = await axios.delete(BASE_URL + `/catalog/track/${trackId}/favorite/`, {
+//       headers: {
+//         Authorization: `Bearer ${accessToken}`,
+//       }
+//     }); 
+//     // console.log("Сняли лайк с трека трек");
+//     // console.log("resp в deleteTrackFromFavorite: ", resp.data);
+//     return resp.data;
+//   } catch (error) {
+//     console.error("Ошибка при удалении трека из избранного: ", error);
+//     throw error;
+//   }
+// }

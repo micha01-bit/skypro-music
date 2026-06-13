@@ -5,10 +5,9 @@ import styles from './playlistTrack.module.css';
 import { useAppDispatch, useAppSelector } from '@/store/store';
 import { setCurrentTrack, setCurrentPlaylist, setIsPlay } from '@/store/features/trackSlice';
 import { TrackType } from '@/sharedTypes/sharedTypes';
-import { checkAccessToken, formatTime } from '@/utils/helpers';
+import {formatTime } from '@/utils/helpers';
 import classNames from 'classnames'; 
-import { MouseEvent, useEffect, useState } from 'react';
-import { addTrackToFavorite, getFavoriteTracks, refreshAccessToken } from '@/app/services/tracks/trackApi'; 
+import { useLikeTrack } from '@/hooks/useLikeTrack';
   
 
 type trackTypeProp = {
@@ -16,34 +15,13 @@ type trackTypeProp = {
   playlist: TrackType[]
 }
 
-// export default function PlaylistTrack ({ name, author, album, time }: trackProp) { 
 export default function PlaylistTrack({ track, playlist }: trackTypeProp) {
   const dispatch = useAppDispatch(); 
+  // console.log("track: ", track); 
 
-   // получить id пользователя из LS
-  const userId = localStorage.getItem("userId");
-  // console.log("Id юзера из LS: ", userId);
+  const isAccessToken = useAppSelector((state) => state.auth.access);
 
-  const usersList = track.staredUser;
-  // console.log("Список пользователей в треке: ", usersList);
-  // console.log(typeof usersList[0]);
-
-  let isTrackInFavorite;
-
-  if (userId) {
-    // проверить, есть ли id пользователя в списке пользователей трека
-    isTrackInFavorite = usersList.includes(userId);
-    // console.log("Id юзера есть в списке трека: ", isTrackInFavorite);
-  }
-
-
-  const [isLiked, setIsLiked] = useState(isTrackInFavorite);
-  // const [isLikedInPlaylist, setIsLikedInPlaylist] = useState(false);
-  // const [isLikedInPlayer, setIsLikedInPlayer] = useState(false);
-  const [error, setError] = useState('');
-  const [access, setAccess] = useState<string | null>(null);
-  const [isFavorite, setIsFavorite] = useState();
-  ;
+  const { toggleLike, isLike } = useLikeTrack(track);
 
 
   // получить текущий трек
@@ -63,69 +41,14 @@ export default function PlaylistTrack({ track, playlist }: trackTypeProp) {
     dispatch(setIsPlay(true)); 
     dispatch(setCurrentPlaylist(playlist));
   } 
-   
-  const onClickLikeInPlaylist = async (e: MouseEvent<SVGSVGElement, globalThis.MouseEvent>, trackId: number, staredUser: string[]) => {
-    console.log("Кликнули по лайку");
-
-    // проверить наличие id пользователя в списке пользователей трека
-
-
-    setIsLiked(!isLiked);
-
-
-    // получить данные из localStorage
-    const accessToken = localStorage.getItem("access");
-    const refreshToken = localStorage.getItem("refresh");
-    // const userId = localStorage.getItem("userId");
-    let newAccessToken = "";
-
-    // проверить access token
-    const isAccessTokenExpired = checkAccessToken();
-
-    // если access token протух, то обновить его
-    if (isAccessTokenExpired) {
-      // console.log("Токен протух: ", isAccessTokenExpired);
-      if (typeof refreshToken === "string" && typeof accessToken === "string") {
-        newAccessToken = await refreshAccessToken(refreshToken);
-        // console.log("Новый access token: ", newAccessToken);
-
-        // текущее время в секундах
-        const currentTime = new Date().getTime() / 1000;
-
-        // обновить время получения токена в LS
-        localStorage.setItem("tokenGetTime", String(currentTime));
-
-        // обновить access token в LS
-        localStorage.setItem("access", newAccessToken);
-        // console.log("Токен обновили и записали новый в LS");
-      }
-    }
-
-
-    const accessTokenToUse = isAccessTokenExpired ? newAccessToken : accessToken;
-
-
-    console.log("accessTokenToUse перед добавлением трека в избранное: ", accessTokenToUse);
-    console.log("currentTrackId перед добавлением трека в избранное: ", currentTrackId);
-
-    if (accessTokenToUse) {
-      try {
-        await addTrackToFavorite(trackId, accessTokenToUse);
-        console.log("Добавили трек в избранное");
-        // setIsLiked(true);
-      } catch (error) {
-        console.error("Ошибка при добавлении трека в избранное: ", error);
-      }
-    }
-  };
  
 
   return (
-    <div className={styles.playlist__item} 
-     onClick={onClickTrack}
-     >
+    <div className={styles.playlist__item}>
       <div className={styles.playlist__track}>
-        <div className={styles.track__title}>
+        <div className={styles.track__title} 
+        onClick={onClickTrack} 
+        >
           <div className={styles.track__titleImage}>
             <svg className={classNames( 
               styles.track__titleSvg,
@@ -155,10 +78,10 @@ export default function PlaylistTrack({ track, playlist }: trackTypeProp) {
         </div>
         <div className="track__time">
           <svg className={styles.track__timeSvg} 
-           onClick={(e) => onClickLikeInPlaylist(e, track._id, track.staredUser)} 
+           onClick={toggleLike}
           >
             {
-              isLiked ?
+              isLike && isAccessToken ?
                 <use xlinkHref="/img/icon/sprite.svg#icon-like-active"></use>
                 :
                 <use xlinkHref="/img/icon/sprite.svg#icon-like"></use>

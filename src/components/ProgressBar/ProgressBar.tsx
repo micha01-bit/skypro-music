@@ -1,5 +1,3 @@
-// 'use client'; 
-  
 import styles from './progressBar.module.css';
 import { ChangeEvent } from 'react';
 
