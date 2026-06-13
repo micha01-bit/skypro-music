@@ -18,12 +18,22 @@ export default function FilterItem({
   onClick,
   isOpen,
   activeFilter,
-  playlist }: titleItemProp) {
-  const uniqueAuthors = [...new Set(playlist.map(track => track.author))];
+  playlist = []
+}: titleItemProp) {
+  const uniqueAuthors = playlist
+    ? [...new Set(playlist.map(track => track.author))]
+    : [];
 
-  const uniqueReleaseYears = [...new Set(playlist.map(track => new Date(track.release_date).getFullYear()))];
+  const uniqueReleaseYears = playlist
+    ? [...new Set(playlist.map(track => {
+        const date = new Date(track.release_date);
+        return isNaN(date.getTime()) ? null : date.getFullYear();
+      }).filter(year => year !== null))]
+    : [];
 
-  const uniqueGenres = [...new Set(playlist.flatMap(track => track.genre))];
+  const uniqueGenres = playlist
+    ? [...new Set(playlist.flatMap(track => track.genre || []))]
+    : [];
 
   return (
     <>
@@ -38,10 +48,9 @@ export default function FilterItem({
         onClick={() => onClick()}
       >
         {title}
-        {isOpen && 
+        {isOpen && (
           <div className={styles.filter__wrapper}>
-            <ul className={styles.filter__list}> 
-              
+            <ul className={styles.filter__list}>
               {title === "исполнителю" &&
                 uniqueAuthors.map((author) => (
                   <li className={styles.filter__item} key={author}>
@@ -64,8 +73,8 @@ export default function FilterItem({
                 ))}
             </ul>
           </div>
-        }
+        )}
       </div>
     </>
-  )
+  );
 }

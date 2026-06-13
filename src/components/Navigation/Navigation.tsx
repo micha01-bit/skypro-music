@@ -3,58 +3,18 @@
 import styles from './navigation.module.css'; 
 import Image from 'next/image'; 
 import Link from 'next/link'; 
-import { useEffect, useState } from 'react';  
-import { clearUser } from '@/store/features/authSlice';
-import { useAppDispatch, useAppSelector } from '@/store/store';
-import { useRouter } from 'next/navigation';
-
-
+import { useState } from 'react';  
   
 export default function Navigation() { 
-   const dispatch = useAppDispatch();
-  const router = useRouter();
-  const isAccessToken = useAppSelector((state) => state.auth.access);
-  // console.log("isAccessToken: ", isAccessToken); 
-
-  const [isBurgerMenuOpen, setIsBurgerMenuOpen] = useState(false); 
-   const [isAuth, setIsAuth] = useState(false);
-  const [isLoading, setIsLoading] = useState(true); 
-   
-   
-  useEffect(() => {
-    if (!isAccessToken) {
-      setIsAuth(false);
-      setIsLoading(false);
-      return;
-    } else if (isAccessToken) {
-      setIsAuth(true);
-      setIsLoading(false);
-    }
-  }, [isAccessToken]);
+  const [isBurgerMenuOpen, setIsBurgerMenuOpen] = useState(false);
 
   const onOpenBurgerMenu = () => {
     setIsBurgerMenuOpen(!isBurgerMenuOpen); 
      } 
-      
-   const goToMain = () => {
-    router.push("/music/main");
-  };
-
-  const logout = () => {
-    dispatch(clearUser());
-    router.push("/auth/signin");
-  };
-
-  const login = () => {
-    router.push("/auth/signin");
-  }; 
-
 
     return ( 
           <nav className={styles.main__nav}>
-            <div className={styles.nav__logo} 
-             onClick={goToMain}
-            >
+            <div className={styles.nav__logo}>
               <Image
                 width={250}
                 height={170}
@@ -84,21 +44,9 @@ export default function Navigation() {
                   </Link>
                 </li>
                 <li className={styles.menu__item}>
-                  {isAuth ?
-                <p
-                  className={styles.menu__link}
-                  onClick={logout}
-                >
-                  Выйти
-                </p>
-                :
-                <p
-                  className={styles.menu__link}
-                  onClick={login}
-                >
-                  Войти
-                 </p> 
-               } 
+                  <Link href="/auth/signin" className={styles.menu__link}>
+                    Войти
+                  </Link>
                 </li> 
                 <li>
               <div>
@@ -114,6 +62,6 @@ export default function Navigation() {
               </ul>
             </div> 
             }
-        </nav> 
+          </nav> 
     )
 }

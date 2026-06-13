@@ -3,6 +3,7 @@
 
 import { regUser } from '@/app/services/auth/authApi';
 import styles from './signup.module.css';
+import classNames from 'classnames';
 import Link from 'next/link';
 import { ChangeEvent, MouseEvent, useState } from 'react';
 import { AxiosError } from 'axios';
@@ -53,10 +54,13 @@ export default function SignUp() {
 
     try {
       const res = await regUser({ email, username, password, passwordConfirmed })
+      // .then((res) => {
+        // console.log("Ответ после регистрации: ", res);
 
         setIsLoading(false);
         
         router.push('/auth/signin');
+        // })
       }   
       catch(error) {
         setIsLoading(false);
@@ -71,17 +75,20 @@ export default function SignUp() {
         }
         // console.log("error: ", error);
       }
-  }; 
-   
-  const onRedirect = async (e: MouseEvent<HTMLButtonElement, globalThis.MouseEvent>) => {
-    e.preventDefault();
+    // .finally(() => {
+    //   setIsLoading(false);
 
-    router.push('/auth/signin/');
+    //   router.push('/auth/signin');
+    // })
   };
 
 
   return (
     <>
+      {/* <div className={styles.wrapper}>
+                <div className={styles.containerEnter}>
+                    <div className={styles.modal__block}>
+                        <form className={styles.modal__form}> */}
       <Link href="/music/main">
         <div className={styles.modal__logo}>
           <img src="/img/logo_modal.png" alt="logo" />
@@ -123,12 +130,10 @@ export default function SignUp() {
       >
         Зарегистрироваться
       </button>
-      <button
-        disabled={isLoading}
-        onClick={onRedirect}
-        className={styles.modal__btnEnter}>
-        Войти
-      </button>
+      {/* </form>
+                    </div>
+                </div>
+            </div> */}
     </>
   );
 }

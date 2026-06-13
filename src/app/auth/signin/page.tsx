@@ -8,7 +8,7 @@ import { ChangeEvent, MouseEvent, useState } from 'react';
 import { AxiosError } from 'axios';
 import { useRouter } from 'next/navigation';
 import { useAppDispatch } from '@/store/store';
-import { setAccessToken, setRefreshToken, setUsername } from '@/store/features/authSlice';
+import { setUsername } from '@/store/features/authSlice';
 
 export default function Signin() {
   const [email, setEmail] = useState('');
@@ -27,7 +27,7 @@ export default function Signin() {
     setPassword(e.target.value);
   };
 
-  const onSubmit = async (e: MouseEvent<HTMLButtonElement, globalThis.MouseEvent>) => {
+  const onSubmit = async (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
 
     setErrorMessage('');
@@ -44,9 +44,9 @@ export default function Signin() {
       const authResp = await authUser({ email, password });
 
       // Сохраняем username в Redux store
-      // dispatch(setUsername(authResp.data.username));
+      dispatch(setUsername(authResp.data.username));
 
-      // localStorage.setItem("userId", String(authResp.data._id));
+      localStorage.setItem("userId", String(authResp.data._id));
 
 
       // Получить время получения токена в секундах и записать в LS
@@ -55,18 +55,14 @@ export default function Signin() {
 
       // Получить токены, записать в LS
       const tokenResp = await getToken({ email, password });
-      dispatch(setAccessToken(tokenResp.data.access));
-      dispatch(setRefreshToken(tokenResp.data.refresh));
-
+      localStorage.setItem("access", tokenResp.data.access);
+      localStorage.setItem("refresh", tokenResp.data.refresh);
 
       setIsLoading(false);
 
       // Открыть главную страницу
-      router.push('/music/main'); 
-       
-      dispatch(setUsername(email)); 
-
-     } catch (error) {
+      router.push('/music/main');
+    } catch (error) {
       setIsLoading(false);
       if (error instanceof AxiosError) {
         if (error.response) {

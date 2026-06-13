@@ -16,10 +16,8 @@ export default function Filter({ playlist }: FilterProp) {
 
   const onOpenDropdownList = (title: string) => {
     setIsOpen(title === isOpen ? "" : title); // закрыть список, если он уже открыт
-    setActiveFilter(title); 
-    // console.log("Открыть список: ", title);
+    setActiveFilter(title);
   };  
-   
 
   return (
     <div className={styles.centerblock__filter}>

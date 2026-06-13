@@ -78,8 +78,7 @@
 .player__btnPlay,
 .player__btnNext,
 .player__btnRepeat,
-.player__btnShuffle, 
-.player__btnLike {
+.player__btnShuffle {
   padding: 5px;
   display: -webkit-box;
   display: -ms-flexbox;
@@ -106,12 +105,6 @@
   width: 22px;
   height: 20px;
   fill: #d9d9d9;
-} 
- 
-.player__btnPrev:hover .player__btnPrevSvg,
-.player__btnPlay:hover .player__btnPlaySvg,
-.player__btnNext:hover .player__btnNextSvg {
-  filter: invert(43%) sepia(0%) saturate(0%) hue-rotate(177deg) brightness(93%) contrast(86%);
 }
 
 .player__btnNext {
@@ -147,15 +140,6 @@
 
 .player__btnRepeat:active svg {
   stroke: #ad61ff; /* Фиолетовый при нажатии */
-} 
- 
-.player__btnLike {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
 }
 
 .player__btnShuffle {
@@ -266,7 +250,7 @@
   color: #ffffff;
 }
 
-/* .trackPlay__dislike {
+.trackPlay__dislike {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -278,7 +262,7 @@
   -ms-flex-align: center;
   align-items: center;
   margin-left: 26%;
-} */
+}
 
 .trackPlay__like,
 .trackPlay__dislike {
@@ -292,7 +276,7 @@
   stroke: #696969;
 }
 
-/* .trackPlay__dislike {
+.trackPlay__dislike {
   margin-left: 28.5px;
 }
 
@@ -301,7 +285,7 @@
   height: 13px;
   fill: transparent;
   stroke: #696969;
-} */
+}
 
 .volume__content {
   display: -webkit-box;
@@ -375,18 +359,17 @@
 }
 
 .btnIcon:active svg {
-  fill: transparent; 
-  /* stroke: #ffffff; */
+  fill: transparent;
   stroke: #ffffff;
   cursor: pointer;
 }
 
-/* .btnIcon:active .trackPlay__likeSvg,
+.btnIcon:active .trackPlay__likeSvg,
 .btnIcon:active .trackPlay__dislikeSvg {
   fill: #696969;
   stroke: #ffffff;
   cursor: pointer;
-} */
+}
 
 .btn-text {
   &:hover {
@@ -405,18 +388,6 @@
   display: none;
 } 
  
-.btnIcon__active svg {
-  fill: #ad61ff;
-  stroke: #ad61ff;
-  cursor: pointer;
-
-  &:hover {
-    fill: #cd9fff;
-    stroke: #cd9fff;
-    /* cursor: pointer; */
-  }
-}
- 
 .trackPlay__timeBlock {
   display: flex;
   justify-content: flex-end;
@@ -431,8 +402,4 @@
   line-height: 24px;
   text-align: right;
   color: #ffffff;
-} 
- 
-.trackPlay__like {
-  display: flex;
 }

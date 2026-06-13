@@ -18,6 +18,7 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
           </div>
         </div>
       </div>
+
     </>
   )
 }

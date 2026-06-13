@@ -1,33 +1,26 @@
+// 'use client';
+ 
 import styles from './playlistTracks.module.css';
 import PlaylistTrack from '../PlaylistTrack/PlaylistTrack';
 import { TrackType } from '@/sharedTypes/sharedTypes';
-import Loading from '../Loading/Loading';  
-import { useAppSelector } from '@/store/store';
+import Loading from '../Loading/Loading'; 
  
  
 type PlaylistTracksProp = {
   playlist: TrackType[],
   isLoading: boolean,
-  error: string, 
-  isAuthRequired: boolean
-} 
+  error: string
+}
 
-
-export default function PlaylistTracks({ playlist, isLoading, error, isAuthRequired }: PlaylistTracksProp) { 
-  // console.log("data в PlaylistTracks: ", playlist);
-  // console.log("data в isLoading: ", isLoading);
-  const isAccessToken = useAppSelector((state) => state.auth.access); 
-
+export default function PlaylistTracks({ playlist, isLoading, error }: PlaylistTracksProp) {
   return (
     <div className={styles.content__playlist}>
-      { 
-       !isAccessToken && isAuthRequired ?
-        <div className={styles.messageContainer}>Авторизуйтесь чтобы посмотреть избранные треки</div>
-        :
-        error ?
+      {error ?
         <div className={styles.errorContainer}>{error}</div>
         :
-        isLoading ?
+        <div className={styles.errorContainer}>{error}</div>
+      }
+      {isLoading ?
         <Loading />
         :
         playlist.map((track) =>

@@ -4,19 +4,21 @@ import Link from 'next/link';
 import styles from './bar.module.css';
 import classnames from 'classnames';
 import { useAppDispatch, useAppSelector } from '@/store/store';
-import { useEffect, useRef, useState, ChangeEvent } from 'react';
+import { useRef, useEffect, useState, ChangeEvent } from 'react';
 import { setIsPlay, setNextTrack, setPrevTrack, toggleIsShuffle } from '@/store/features/trackSlice';
 import { getTimePanel } from '@/utils/helpers';
 import ProgressBar from '../ProgressBar/ProgressBar';
-import { useLikeTrack } from '@/hooks/useLikeTrack';
 
 export default function Bar() {
   const dispatch = useAppDispatch();
 
-  const isAccessToken = useAppSelector((state) => state.auth.access);
   const currentTrack = useAppSelector((state) => state.tracks.currentTrack);
-  const currentTrackName = useAppSelector((state) => state.tracks.currentTrack?.name);
-  const currentTrackAuthor = useAppSelector((state) => state.tracks.currentTrack?.author);
+  const currentTrackName = useAppSelector(
+    (state) => state.tracks.currentTrack?.name,
+  );
+  const currentTrackAuthor = useAppSelector(
+    (state) => state.tracks.currentTrack?.author,
+  );
   const currentTrackIsPlay = useAppSelector((state) => state.tracks.isPlay);
   const isShuffle = useAppSelector((state) => state.tracks.isShuffle);
 
@@ -26,68 +28,91 @@ export default function Bar() {
   const [duration, setDuration] = useState(0);
   const [isLoadedTrack, setIsLoadedTrack] = useState(false);
   const [progressBarTime, setProgressBarTime] = useState(0);
-  const [isMuted, setIsMuted] = useState(false);
-  const [currentVolume, setCurrentVolume] = useState(0.5);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const { toggleLike, isLike } = useLikeTrack(currentTrack);
+  const isPlayingRef = useRef(false); // синхронизация состояния
 
-  // Эффект для синхронизации громкости и отключения звука
-  useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.volume = isMuted ? 0 : volume;
-      audioRef.current.muted = isMuted;
-    }
-  }, [volume, isMuted]);
-
-  // Сброс состояния при смене трека
+  // Синхронизация isPlay с реальным состоянием аудиоэлемента
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
 
-    audio.pause();
-    audio.currentTime = 0;
-    setIsLoadedTrack(false);
-    setCurrentTime(0);
-    setDuration(0);
-    setProgressBarTime(0);
-  }, [currentTrack]);
+    const syncState = () => {
+      isPlayingRef.current = !audio.paused;
+      if (isPlayingRef.current !== currentTrackIsPlay) {
+        dispatch(setIsPlay(isPlayingRef.current));
+      }
+    };
 
-  // Основной эффект управления воспроизведением
+    audio.addEventListener('play', syncState);
+    audio.addEventListener('pause', syncState);
+
+    return () => {
+      audio.removeEventListener('play', syncState);
+      audio.removeEventListener('pause', syncState);
+    };
+  }, [dispatch, currentTrackIsPlay]);
+
+  // Управление воспроизведением при смене isPlay
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio || !currentTrack) return;
 
-    const playAudio = async () => {
+    const controlPlayback = async () => {
       try {
-        if (currentTrackIsPlay && isLoadedTrack) {
+        if (currentTrackIsPlay && audio.paused) {
           await audio.play();
-        } else {
+        } else if (!currentTrackIsPlay && !audio.paused) {
           audio.pause();
         }
       } catch (error) {
-        console.error('Ошибка управления воспроизведением:', error);
-        dispatch(setIsPlay(false));
+        console.warn('Playback failed:', error);
       }
     };
 
-    playAudio();
-  }, [currentTrackIsPlay, isLoadedTrack, currentTrack]);
+    controlPlayback();
+  }, [currentTrackIsPlay, currentTrack]);
 
-  const playPauseTrack = () => {
-    dispatch(setIsPlay(!currentTrackIsPlay));
-  };
+  // Обновление громкости при изменении состояния
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = volume;
+    }
+  }, [volume]);
 
-  const onVolumeChange = (currentVolumeLevel: number) => {
-    setVolume(currentVolumeLevel);
-    if (currentVolumeLevel === 0) {
-      setIsMuted(true);
-    } else {
-      setIsMuted(false);
+  // Сброс состояния загрузки при смене трека
+  useEffect(() => {
+    setIsLoadedTrack(false);
+  }, [currentTrack]);
+
+  if (!currentTrack) return <></>;
+
+  const playPauseTrack = async () => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    try {
+      if (audio.paused) {
+        await audio.play();
+        dispatch(setIsPlay(true));
+      } else {
+        audio.pause();
+        dispatch(setIsPlay(false));
+      }
+    } catch (error) {
+      console.error('Play/Pause failed:', error);
     }
   };
 
-  const onToggleLoop = () => setIsLoop(!isLoop);
+  const onVolumeChange = (currentVolumeLevel: number) => {
+    if (audioRef.current) {
+      setVolume(currentVolumeLevel);
+    }
+  };
+
+  const onToggleLoop = () => {
+    setIsLoop(!isLoop);
+  };
 
   const onTimeUpdate = () => {
     if (audioRef.current && isLoadedTrack) {
@@ -97,7 +122,10 @@ export default function Bar() {
   };
 
   const onLoadedMetadata = () => {
-    setIsLoadedTrack(true);
+    if (audioRef.current) {
+      // Не вызываем play() здесь — управление через useEffect выше
+      setIsLoadedTrack(true);
+    }
   };
 
   const onEnded = () => {
@@ -105,9 +133,8 @@ export default function Bar() {
 
     if (isLoop) {
       if (audioRef.current) {
-        audioRef.current.currentTime = 0;
         audioRef.current.play().catch(error => {
-          console.error('Ошибка зацикливания:', error);
+          console.warn('Loop playback failed:', error);
         });
       }
     } else {
@@ -124,21 +151,17 @@ export default function Bar() {
     }
   };
 
-  const onSetNextTrack = () => dispatch(setNextTrack());
-  const onSetPrevTrack = () => dispatch(setPrevTrack());
-  const onToggleShuffle = () => dispatch(toggleIsShuffle());
-
-  const onMute = () => {
-    if (isMuted) {
-      setVolume(currentVolume);
-    } else {
-      setCurrentVolume(volume);
-      setVolume(0);
-    }
-    setIsMuted(!isMuted);
+  const onSetNextTrack = () => {
+    dispatch(setNextTrack());
   };
 
-  if (!currentTrack) return null;
+  const onSetPrevTrack = () => {
+    dispatch(setPrevTrack());
+  };
+
+  const onToggleShuffle = () => {
+    dispatch(toggleIsShuffle());
+  };
 
   return (
     <div className={styles.bar}>
@@ -151,7 +174,6 @@ export default function Bar() {
         onTimeUpdate={onTimeUpdate}
         onLoadedMetadata={onLoadedMetadata}
         onEnded={onEnded}
-        muted={isMuted}
       />
       <div className={styles.bar__content}>
         <div className={styles.trackPlay__timeBlock}>
@@ -182,8 +204,13 @@ export default function Bar() {
                 onClick={playPauseTrack}
               >
                 <svg className={styles.player__btnPlaySvg}>
-                  <use xlinkHref={
-                    currentTrackIsPlay ? "/img/icon/sprite.svg#icon-pause" : "/img/icon/sprite.svg#icon-play"}></use>
+                  <use
+                    xlinkHref={
+              currentTrackIsPlay
+                ? '/img/icon/sprite.svg#icon-pause'
+                : '/img/icon/sprite.svg#icon-play'
+            }
+                  ></use>
                 </svg>
               </div>
               <div
@@ -194,12 +221,12 @@ export default function Bar() {
                   <use xlinkHref="/img/icon/sprite.svg#icon-next"></use>
                 </svg>
               </div>
-              <div
+                            <div
                 onClick={onToggleLoop}
                 className={classnames(
                   styles.player__btnRepeat,
-                  { [styles.btnIcon__active]: isLoop },
-                  { [styles.btnIcon]: !isLoop }
+                  styles.btnIcon,
+                  { [styles.btnIcon__active]: isLoop }
                 )}
               >
                 <svg className={styles.player__btnRepeatSvg}>
@@ -209,8 +236,8 @@ export default function Bar() {
               <div
                 className={classnames(
                   styles.player__btnShuffle,
-                  { [styles.btnIcon__active]: isShuffle },
-                  { [styles.btnIcon]: !isShuffle }
+                  styles.btnIcon,
+                  { [styles.btnIcon__active]: isShuffle }
                 )}
                 onClick={onToggleShuffle}
               >
@@ -239,33 +266,43 @@ export default function Bar() {
                 </div>
               </div>
 
-              <div className={styles.trackPlay__like}>
+              <div className={styles.trackPlay__dislike}>
                 <div
-                  className={classnames(styles.player__btnLike, styles.btnIcon)}
-                  onClick={toggleLike}
+                  className={classnames(
+                    styles.player__btnShuffle,
+                    styles.btnIcon
+                  )}
                 >
                   <svg className={styles.trackPlay__likeSvg}>
-                    <use xlinkHref={`/img/icon/sprite.svg#${isLike && isAccessToken ? "icon-like-active" : "icon-like"}`}></use>
+                    <use xlinkHref="/img/icon/sprite.svg#icon-like"></use>
                   </svg>
                 </div>
-
+                <div
+                  className={classnames(
+                    styles.trackPlay__dislike,
+                    styles.btnIcon
+                  )}
+                >
+                  <svg className={styles.trackPlay__dislikeSvg}>
+                    <use xlinkHref="/img/icon/sprite.svg#icon-dislike"></use>
+                  </svg>
+                </div>
               </div>
             </div>
           </div>
           <div className={styles.bar__volumeBlock}>
             <div className={styles.volume__content}>
-              <div
-                className={styles.volume__image}
-                onClick={onMute}
-              >
+              <div className={styles.volume__image}>
                 <svg className={styles.volume__svg}>
-                  <use xlinkHref={isMuted ? "/img/icon/sprite.svg#icon-mute" : "/img/icon/sprite.svg#icon-volume"}></use>
-
+                  <use xlinkHref="/img/icon/sprite.svg#icon-volume"></use>
                 </svg>
               </div>
               <div className={classnames(styles.volume__progress, styles.btn)}>
                 <input
-                  className={classnames(styles.volume__progressLine, styles.btn)}
+                  className={classnames(
+                    styles.volume__progressLine,
+                    styles.btn
+                  )}
                   type="range"
                   name="range"
                   min="0"
@@ -279,6 +316,6 @@ export default function Bar() {
           </div>
         </div>
       </div>
-    </div >
-  )
+    </div>
+  );
 }
