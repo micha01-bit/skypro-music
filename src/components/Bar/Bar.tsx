@@ -40,14 +40,12 @@ export default function Bar() {
     }
   }, [volume, isMuted]);
 
-  // Сброс состояния при смене трека
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
 
-    audio.pause();
-    audio.currentTime = 0;
-    setIsLoadedTrack(false);
+    audio.currentTime = 0; 
+    setIsLoadedTrack(false); // Сбрасываем флаг загрузки, так как src изменится
     setCurrentTime(0);
     setDuration(0);
     setProgressBarTime(0);
@@ -56,23 +54,47 @@ export default function Bar() {
   // Основной эффект управления воспроизведением
   useEffect(() => {
     const audio = audioRef.current;
+    
     if (!audio || !currentTrack) return;
 
-    const playAudio = async () => {
+    const managePlayback = async () => {
       try {
         if (currentTrackIsPlay && isLoadedTrack) {
-          await audio.play();
+          // Если должен играть и трек загружен
+          if (audio.paused || audio.ended) {
+            await audio.play();
+          }
         } else {
-          audio.pause();
+          // Если должен быть на паузе
+          if (!audio.paused && !audio.ended) {
+            audio.pause();
+          }
         }
       } catch (error) {
+        // Обработка ошибки браузера (блокировка автовоспроизведения)
+        if (error instanceof Error && error.name === 'NotAllowedError') {
+          console.warn('Автовоспроизведение заблокировано браузером. Требуется действие пользователя.');
+          if (currentTrackIsPlay) {
+            dispatch(setIsPlay(false));
+          }
+          return;
+        }
+
+        // Игнорируем AbortError при переключении треков (это нормально)
+        if (error instanceof Error && error.name === 'AbortError') {
+          return;
+        }
+
         console.error('Ошибка управления воспроизведением:', error);
-        dispatch(setIsPlay(false));
+        
+        if (currentTrackIsPlay) {
+          dispatch(setIsPlay(false));
+        }
       }
     };
 
-    playAudio();
-  }, [currentTrackIsPlay, isLoadedTrack, currentTrack]);
+    managePlayback();
+  }, [currentTrackIsPlay, isLoadedTrack, currentTrack, dispatch]);
 
   const playPauseTrack = () => {
     dispatch(setIsPlay(!currentTrackIsPlay));
@@ -91,8 +113,11 @@ export default function Bar() {
 
   const onTimeUpdate = () => {
     if (audioRef.current && isLoadedTrack) {
-      setCurrentTime(audioRef.current.currentTime);
-      setDuration(audioRef.current.duration);
+      const current = audioRef.current.currentTime;
+      const duration = audioRef.current.duration;
+      
+      setCurrentTime(current);
+      if (duration > 0) setDuration(duration);
     }
   };
 
@@ -101,17 +126,20 @@ export default function Bar() {
   };
 
   const onEnded = () => {
-    dispatch(setIsPlay(false));
-
     if (isLoop) {
-      if (audioRef.current) {
-        audioRef.current.currentTime = 0;
-        audioRef.current.play().catch(error => {
-          console.error('Ошибка зацикливания:', error);
+      // ЛОГИКА ЦИКЛА: перезапуск текущего трека
+      const audio = audioRef.current;
+      if (audio) {
+        audio.currentTime = 0;
+        audio.play().catch((err) => {
+          console.error('Не удалось перезапустить трек в цикле:', err);
+          dispatch(setIsPlay(false));
         });
       }
     } else {
+      
       dispatch(setNextTrack());
+       
     }
   };
 
@@ -183,7 +211,8 @@ export default function Bar() {
               >
                 <svg className={styles.player__btnPlaySvg}>
                   <use xlinkHref={
-                    currentTrackIsPlay ? "/img/icon/sprite.svg#icon-pause" : "/img/icon/sprite.svg#icon-play"}></use>
+                    currentTrackIsPlay ? "/img/icon/sprite.svg#icon-pause" : "/img/icon-sprite.svg#icon-play"
+                  }></use>
                 </svg>
               </div>
               <div
@@ -248,7 +277,6 @@ export default function Bar() {
                     <use xlinkHref={`/img/icon/sprite.svg#${isLike && isAccessToken ? "icon-like-active" : "icon-like"}`}></use>
                   </svg>
                 </div>
-
               </div>
             </div>
           </div>
@@ -260,7 +288,6 @@ export default function Bar() {
               >
                 <svg className={styles.volume__svg}>
                   <use xlinkHref={isMuted ? "/img/icon/sprite.svg#icon-mute" : "/img/icon/sprite.svg#icon-volume"}></use>
-
                 </svg>
               </div>
               <div className={classnames(styles.volume__progress, styles.btn)}>
