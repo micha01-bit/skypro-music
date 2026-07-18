@@ -27,7 +27,7 @@ color: #AD61FF;
 
 .filter__wrapper {
 padding: 34px;
-background-color: #313131; /* Темный фон самого выпадающего меню */
+background-color: #313131; 
 border-radius: 12px;
 position: absolute;
 top: 49px;
@@ -67,29 +67,26 @@ padding: 8px 16px;
 cursor: pointer;
 border-radius: 8px;
 transition: color 0.2s ease;
-color: #E0E0E0; /* Серый цвет неактивного текста */
-background-color: transparent; /* Прозрачный фон по умолчанию */
+color: #E0E0E0; 
+background-color: transparent; 
 text-align: left;
 white-space: nowrap;
 }
 
-/* Стиль при наведении курсора */
+
 .filter__item:hover {
-background-color: rgba(255, 255, 255, 0.15); /* Легкий полупрозрачный блок при наведении мышкой */
+background-color: rgba(255, 255, 255, 0.15); 
 color: #FFFFFF;
 }
 
-/*  СТИЛЬ ВЫБРАННОГО ЭЛЕМЕНТА: ТОЛЬКО ТЕКСТ */
 .filter__item.selected {
-/* background-color: none; или просто не указываем его */
-color: #B672FF; /* Фиолетовый цвет текста (как в активных кнопках) */
-font-weight: 400; /* Жирный шрифт для акцента */
+color: #B672FF; 
+font-weight: 400; 
 }
 
-/* Опционально: если навести на уже выбранный элемент */
 .filter__item.selected:hover {
-background-color: rgba(182, 114, 255, 0.2); /* Очень легкий оттенок фиолетового, если нужно */
-color: #FFFFFF; /* Или оставить фиолетовый, зависит от дизайна */
+background-color: rgba(182, 114, 255, 0.2); 
+color: #FFFFFF; 
 }
 
 .active {

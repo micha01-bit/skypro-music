@@ -5,14 +5,11 @@ export function getUniqueValuesByKey(
   arr: TrackType[],
   key: keyof TrackType,
 ): string[] {
-  // используем Set для хранения уникальных значений
   const uniqueValues = new Set<string>();
 
-  // проходим по каждому объекту в массиве
   arr.forEach((item) => {
     const value = item[key];
 
-    // если value - массив строк
     if (Array.isArray(value)) {
       value.forEach((v) => {
         if (v) {
@@ -21,13 +18,11 @@ export function getUniqueValuesByKey(
       });
     }
 
-    // если value - строка
     else if (typeof value === 'string') {
       uniqueValues.add(value);
     }
   });
 
-  // преобразовываем Set обратно в массив и возвращаем
   return Array.from(uniqueValues);
 }
 
@@ -53,15 +48,11 @@ export const checkAccessToken = ():boolean => {
   const tokenLifetime = 200;
 
   const tokenGetTime = parseInt(localStorage.getItem("tokenGetTime") || "0", 10);
-  // console.log("Время получения токена из LS в проверке токена: ", tokenGetTime);
 
   // текущее время в секундах
   const currentTime = new Date().getTime() / 1000;
-  // console.log("время получения токена в секундах: ", tokenGetTime);
 
   const isAccessTokenExpired = Math.round(currentTime - tokenGetTime) >= tokenLifetime;
-  // console.log("Разница времени получения токена и текущего времени в секундах в проверке токена: ", Math.round(currentTime - tokenGetTime));
-  // console.log("Access токен истёк? в проверке токена: ", isAccessTokenExpired);
 
   return isAccessTokenExpired;
 }

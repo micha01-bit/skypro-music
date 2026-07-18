@@ -70,5 +70,4 @@ describe('checkAccessToken function', () => {
     expect(checkAccessToken()).toBe(true);
   });
   
-  // Удалили блок afterEach с restoreAllMocks
 });

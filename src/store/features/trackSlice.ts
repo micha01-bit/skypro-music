@@ -13,16 +13,13 @@ type initialStateType = {
   fetchIsLoading: boolean;
 };
 
-// Функция для безопасной загрузки из localStorage
 const loadFavoriteTracks = (): TrackType[] => {
-  // Проверяем, что мы в браузере (не на сервере)
   if (typeof window === 'undefined') return [];
 
   try {
     const saved = localStorage.getItem('favoriteTracks');
     return saved ? JSON.parse(saved) : [];
   } catch (error) {
-    console.error('Ошибка парсинга favoriteTracks из localStorage:', error);
     return [];
   }
 };
@@ -48,7 +45,6 @@ const trackSlice = createSlice({
     },
     setCurrentPlaylist: (state, action: PayloadAction<TrackType[]>) => {
       state.currentPlaylist = action.payload;
-      // spread-оператор — чтобы не мутировал исходный плейлист
       state.shuffledPlaylist = [...state.currentPlaylist].sort(() => Math.random() - 0.5);
     },
     setIsPlay: (state, action: PayloadAction<boolean>) => {
@@ -80,17 +76,14 @@ const trackSlice = createSlice({
     },
     setFavoriteTracks: (state, action: PayloadAction<TrackType[]>) => {
       state.favoriteTracks = action.payload;
-      // Сохраняем в localStorage только в браузере
       if (typeof window !== 'undefined') {
         try {
           localStorage.setItem('favoriteTracks', JSON.stringify(action.payload));
         } catch (error) {
-          console.error('Ошибка сохранения в localStorage:', error);
         }
       }
     },
     addLikedTracks: (state, action: PayloadAction<TrackType>) => {
-      // Проверяем, нет ли уже такого трека в избранном
       const isAlreadyLiked = state.favoriteTracks.some(
         (track) => track._id === action.payload._id
       );
@@ -98,12 +91,11 @@ const trackSlice = createSlice({
       if (!isAlreadyLiked) {
         state.favoriteTracks = [...state.favoriteTracks, action.payload];
 
-        // Сохраняем в localStorage
         if (typeof window !== 'undefined') {
           try {
             localStorage.setItem('favoriteTracks', JSON.stringify(state.favoriteTracks));
           } catch (error) {
-            console.error('Ошибка сохранения в localStorage:', error);
+            
           }
         }
       }
@@ -113,7 +105,6 @@ const trackSlice = createSlice({
         (track) => track._id !== action.payload._id
       );
 
-      // Сохраняем в localStorage
       if (typeof window !== 'undefined') {
         try {
           localStorage.setItem('favoriteTracks', JSON.stringify(state.favoriteTracks));
