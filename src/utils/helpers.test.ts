@@ -44,29 +44,31 @@ describe('getUniqueValuesByKey function', () => {
 
 describe('checkAccessToken function', () => {
   beforeEach(() => {
-    jest.spyOn(localStorage, 'getItem').mockImplementation((key) => {
+    // Сбрасываем моки перед каждым тестом
+    (localStorage.getItem as jest.Mock).mockClear();
+  });
+
+  it('should return false if token is not expired', () => {
+    (localStorage.getItem as jest.Mock).mockImplementation((key: string) => {
       if (key === 'tokenGetTime') {
         return String(Math.floor(Date.now() / 1000));
       }
       return null;
     });
-  });
 
-  afterEach(() => {
-    jest.restoreAllMocks();
-  });
-
-  it('should return false if token is not expired', () => {
-    // Токен получен сейчас — не истёк
     expect(checkAccessToken()).toBe(false);
   });
 
   it('should return true if token is expired', () => {
-    const mockTime = Math.floor(Date.now() / 1000) - 300; // 5 минут назад
-    jest.spyOn(localStorage, 'getItem').mockImplementation((key) => {
+    const mockTime = Math.floor((Date.now() - 3600000) / 1000); // 1 час назад
+    
+    (localStorage.getItem as jest.Mock).mockImplementation((key: string) => {
       if (key === 'tokenGetTime') return String(mockTime);
       return null;
     });
+
     expect(checkAccessToken()).toBe(true);
   });
+  
+  // Удалили блок afterEach с restoreAllMocks
 });

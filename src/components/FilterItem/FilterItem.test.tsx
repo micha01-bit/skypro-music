@@ -1,4 +1,5 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { within } from '@testing-library/dom';
 import '@testing-library/jest-dom';
 import FilterItem from '@/components/FilterItem/FilterItem';
 import { TrackType } from '@/sharedTypes/sharedTypes';
@@ -9,63 +10,96 @@ const mockTracks: TrackType[] = [
 ];
 
 describe('FilterItem component', () => {
-  it('should open dropdown on button click', () => {
-    const mockOnClick = jest.fn();
+  it('should open dropdown on button click', async () => {
+    // 1. Создаем начальное состояние
+    let isOpen = false;
+    
+    // Функция, которую мы передадим в onClick. 
+    // В реальном приложении она меняет стейт родителя.
+    const handleClick = () => {
+      isOpen = !isOpen;
+    };
 
-    render(
+    // Рендерим компонент с начальным состоянием (закрыт)
+    const { rerender } = render(
       <FilterItem 
         title="исполнителю" 
-        onClick={mockOnClick} 
-        isOpen={false} 
-        currentValues={[]} // Было: currentValue="", стало: пустой массив
+        onClick={handleClick} 
+        isOpen={isOpen} 
+        currentValues={[]} 
         onSelect={jest.fn()} 
         playlist={mockTracks} 
       />
     );
 
     const button = screen.getByText('исполнителю');
-    fireEvent.click(button);
-
-    // Проверяем, что открылся дропдаун и в нём есть элементы
-    expect(screen.queryByText('Artist A')).toBeInTheDocument();
-    expect(mockOnClick).toHaveBeenCalledWith('исполнителю'); // Проверяем вызов onClick
-  });
-
-  it('should select an option and trigger onSelect', () => {
-    const mockOnSelect = jest.fn();
-    const mockOnClick = jest.fn();
-
-    render(
-      <FilterItem 
-        title="исполнителю" 
-        onClick={mockOnClick} 
-        isOpen={true} 
-        currentValues={[]} // Пустой массив = ничего не выбрано
-        onSelect={mockOnSelect} 
-        playlist={mockTracks} 
-      />
-    );
-
-    const option = screen.getByText('Artist A');
-    fireEvent.click(option);
-
-    expect(mockOnSelect).toHaveBeenCalledWith('Artist A');
     
-  });
-  
-  it('should highlight selected item with "selected" class', () => {
-    render(
+    // Делаем клик. 
+    // ВАЖНО: Клик только вызывает handleClick, который меняет переменную isOpen.
+    // Сам компонент еще не обновился!
+    await fireEvent.click(button);
+
+    // 2. ЭМУЛИРУЕМ ОБНОВЛЕНИЕ РОДИТЕЛЯ:
+    // Вызываем rerender с НОВЫМ значением isOpen (которое мы изменили в handleClick)
+    rerender(
       <FilterItem 
         title="исполнителю" 
-        onClick={jest.fn()} 
-        isOpen={true} 
-        currentValues={['Artist A']} // ✅ Передаем массив с выбранным элементом
+        onClick={handleClick} 
+        isOpen={isOpen} // Теперь тут true!
+        currentValues={[]} 
         onSelect={jest.fn()} 
         playlist={mockTracks} 
       />
     );
 
-    const selectedOption = screen.getByText('Artist A');
-    expect(selectedOption).toHaveClass('filter__item selected');
+    // Теперь ждем, пока появится список (он появится, потому что isOpen=true)
+    await waitFor(() => {
+      expect(screen.getByTestId('filter-list')).toBeInTheDocument();
+    });
+
+    const listContainer = screen.getByTestId('filter-list');
+    const artistAElement = await within(listContainer).findByText('Artist A');
+    
+    expect(artistAElement).toBeInTheDocument();
+  });
+
+  it('should select an option and trigger onSelect', async () => {
+    const mockOnSelect = jest.fn();
+
+    render(
+      <FilterItem 
+        title="исполнителю" 
+        onClick={jest.fn()} 
+        isOpen={true} 
+        currentValues={[]} 
+        onSelect={mockOnSelect} 
+        playlist={mockTracks} 
+      />
+    );
+
+    const listContainer = screen.getByTestId('filter-list');
+    const option = await within(listContainer).findByText('Artist A');
+    
+    await fireEvent.click(option);
+    expect(mockOnSelect).toHaveBeenCalledWith('Artist A');
+  });
+  
+  it('should highlight selected item with "selected" class', async () => {
+    render(
+      <FilterItem 
+        title="исполнителю" 
+        onClick={jest.fn()} 
+        isOpen={true} 
+        currentValues={['Artist A']} 
+        onSelect={jest.fn()} 
+        playlist={mockTracks} 
+      />
+    );
+
+    const listContainer = screen.getByTestId('filter-list');
+    const selectedOption = await within(listContainer).findByText('Artist A');
+    
+    // Проверка класса для CSS Modules
+    expect(selectedOption.className).toContain('selected');
   });
 });

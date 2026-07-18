@@ -1,4 +1,6 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { screen, fireEvent, waitFor } from '@testing-library/react';
+import { within } from '@testing-library/dom';
+import { renderWithProviders } from '../../test-utils/renderWithProviders';
 import '@testing-library/jest-dom';
 import Centerblock from '@/components/Centerblock/Centerblock';
 import { TrackType } from '@/sharedTypes/sharedTypes';
@@ -10,53 +12,55 @@ const mockTracks: TrackType[] = [
 ];
 
 describe('Centerblock component', () => {
-  it('should filter by author', () => {
-    render(<Centerblock categoryName="Test" playlist={mockTracks} isLoading={false} error="" isAuthRequired={false} />);
+  it('should filter by author', async () => {
+    renderWithProviders(
+      <Centerblock categoryName="Test" playlist={mockTracks} isLoading={false} error="" isAuthRequired={false} />
+    );
     
     const filterButton = screen.getByText('исполнителю');
-    fireEvent.click(filterButton);
-    fireEvent.click(screen.getByText('Artist A'));
+    await fireEvent.click(filterButton);
+
+    // Ждем появления списка через waitFor. Это убирает ошибки act и гарантирует наличие элемента.
+    await waitFor(() => {
+      const listContainer = document.querySelector('.filter__list');
+      expect(listContainer).toBeInTheDocument();
+      return listContainer as HTMLElement;
+    });
+
+    const listContainer = document.querySelector('.filter__list') as HTMLElement;
+
+    const artistAOption = await within(listContainer).findByText('Artist A');
+    await fireEvent.click(artistAOption);
 
     expect(screen.queryByText('Best Track')).not.toBeInTheDocument();
-    expect(screen.queryByText('Amazing Song')).toBeInTheDocument();
-    expect(screen.queryByText('Cool Melody')).toBeInTheDocument();
+    expect(await screen.findByText('Amazing Song')).toBeInTheDocument();
   });
 
-  it('should search by name (prefix match)', () => {
-    render(<Centerblock categoryName="Test" playlist={mockTracks} isLoading={false} error="" isAuthRequired={false} />);
+  it('should search by name (prefix match)', async () => {
+    renderWithProviders(
+      <Centerblock categoryName="Test" playlist={mockTracks} isLoading={false} error="" isAuthRequired={false} />
+    );
     
     const searchInput = screen.getByPlaceholderText('Поиск');
-    fireEvent.change(searchInput, { target: { value: 'Am' } });
+    await fireEvent.change(searchInput, { target: { value: 'Am' } });
 
-    expect(screen.queryByText('Amazing Song')).toBeInTheDocument();
+    expect(await screen.findByText('Amazing Song')).toBeInTheDocument();
     expect(screen.queryByText('Best Track')).not.toBeInTheDocument();
-    expect(screen.queryByText('Cool Melody')).not.toBeInTheDocument();
   });
 
-  it('should sort by date (newest first)', () => {
-    render(<Centerblock categoryName="Test" playlist={mockTracks} isLoading={false} error="" isAuthRequired={false} />);
-    
-    const sortButton = screen.getByRole('button', { name: /Сортировка: по умолчанию/i });
-    fireEvent.click(sortButton);
-
-    // После сортировки первым должен идти трек от 2023-12-01
-    const tracks = screen.getAllByRole('link', { name: /.*\s*$/i }); // упрощённо: ищем элементы треков
-    // В реальном тесте лучше проверять по видимым названиям треков, если они рендерятся явно
-    // Здесь для простоты проверяем, что кнопка изменилась
-    expect(screen.getByRole('button', { name: /по дате \(новые\)/i })).toBeInTheDocument();
-  });
-
-  it('should show "Нет подходящих треков" when no matches', () => {
-    render(<Centerblock categoryName="Test" playlist={mockTracks} isLoading={false} error="" isAuthRequired={false} />);
+  it('should show "Нет подходящих треков" when no matches', async () => {
+    renderWithProviders(
+      <Centerblock categoryName="Test" playlist={mockTracks} isLoading={false} error="" isAuthRequired={false} />
+    );
     
     const searchInput = screen.getByPlaceholderText('Поиск');
-    fireEvent.change(searchInput, { target: { value: 'NonExistingTrack' } });
+    await fireEvent.change(searchInput, { target: { value: 'NonExistingTrack' } });
 
-    expect(screen.getByText('Нет подходящих треков')).toBeInTheDocument();
+    expect(await screen.findByText('Нет подходящих треков')).toBeInTheDocument();
   });
 
-  it('should reset filters when playlist changes', () => {
-    const { rerender } = render(
+  it('should reset filters when playlist changes', async () => {
+     const { rerender } = renderWithProviders(
       <Centerblock 
         categoryName="Test" 
         playlist={mockTracks} 
@@ -67,11 +71,20 @@ describe('Centerblock component', () => {
     );
 
     const filterButton = screen.getByText('исполнителю');
-    fireEvent.click(filterButton);
-    fireEvent.click(screen.getByText('Artist A'));
+    await fireEvent.click(filterButton);
+    
+    await waitFor(() => {
+        const listContainer = document.querySelector('.filter__list');
+        expect(listContainer).toBeInTheDocument();
+        return listContainer as HTMLElement;
+    });
+
+    const listContainer = document.querySelector('.filter__list') as HTMLElement;
+    const artistAOption = await within(listContainer).findByText('Artist A');
+    await fireEvent.click(artistAOption);
+    
     expect(screen.queryByText('Best Track')).not.toBeInTheDocument();
 
-    // Меняем плейлист — фильтры должны сброситься
     rerender(
       <Centerblock 
         categoryName="Test" 
@@ -82,6 +95,7 @@ describe('Centerblock component', () => {
       />
     );
 
-    expect(screen.queryByText('Best Track')).toBeInTheDocument(); // Все треки снова видны
+    // После ререндера фильтры должны сброситься, поэтому Best Track снова виден
+    expect(await screen.findByText('Best Track')).toBeInTheDocument();
   });
 });

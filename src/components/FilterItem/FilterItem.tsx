@@ -60,7 +60,7 @@ export default function FilterItem({
         
         {isOpen && (
           <div className={styles.filter__wrapper}>
-            <ul className={styles.filter__list}>
+            <ul className={styles.filter__list} data-testid="filter-list">
               
               {title === "исполнителю" &&
                 uniqueAuthors.map((author) => {
