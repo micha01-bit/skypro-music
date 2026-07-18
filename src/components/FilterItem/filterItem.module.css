@@ -1,80 +1,98 @@
 .filter__button {
-  /*composes: btn-text from '/src/UI/Button/button.module.css';*/
-  font-style: normal;
-  font-weight: 400;
-  font-size: 16px;
-  line-height: 24px;
-  border: 1px solid #ffffff;
-  border-radius: 60px;
-  padding: 6px 20px;
-  color: #FFFFFF;
-  cursor: pointer;
-  position: relative;
-} 
- 
+font-style: normal;
+font-weight: 400;
+font-size: 16px;
+line-height: 24px;
+border: 1px solid #ffffff;
+border-radius: 60px;
+padding: 6px 20px;
+margin-right: 10px;
+color: #FFFFFF;
+cursor: pointer;
+position: relative;
+display: flex;
+align-items: center;
+gap: 8px;
+}
+
 .filter__button:hover {
-  border: 1px solid #D9B6FF;
-  color: #D9B6FF;
+border: 1px solid #D9B6FF;
+color: #D9B6FF;
 }
 
 .filter__button:active {
-  border: 1px solid #AD61FF;
-  color: #AD61FF;
-}
-
-.filter__button:not(:last-child) {
-  margin-right: 10px;
+border: 1px solid #AD61FF;
+color: #AD61FF;
 }
 
 .filter__wrapper {
-  /* width: 248px; */
-  /* height: 305px; */
-  padding: 34px;
-  background-color: #313131;
-  border-radius: 12px;
-  position: absolute;
-  top: 49px;
-  left: 0px;
+padding: 34px;
+background-color: #313131; /* Темный фон самого выпадающего меню */
+border-radius: 12px;
+position: absolute;
+top: 49px;
+left: 0px;
+z-index: 100;
+box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+max-width: 248px;
 }
 
 .filter__list {
-  color: white;
-  display: flex;
-  gap: 28px;
-  height: max-content;
-  max-height: 237px;
-  overflow-y: auto;
-  flex-direction: column;
-  width: max-content;
-  max-width: 248px;
+list-style: none;
+padding: 0;
+margin: 0;
+color: white;
+display: flex;
+flex-direction: column;
+gap: 12px;
+height: max-content;
+max-height: 300px;
+overflow-y: auto;
 
-  &::-webkit-scrollbar {
-    width: 4px;
-  }
+&::-webkit-scrollbar {
+width: 6px;
+}
+&::-webkit-scrollbar-track {
+background-color: rgba(75, 73, 73, 1);
+}
+&::-webkit-scrollbar-thumb {
+background-color: #555;
+border-radius: 3px;
+}
+}
 
-  &::-webkit-scrollbar-track {
-    background-color: rgba(75, 73, 73, 1);
-  }
+/* Базовый стиль пункта */
+.filter__item {
+padding: 8px 16px;
+cursor: pointer;
+border-radius: 8px;
+transition: color 0.2s ease;
+color: #E0E0E0; /* Серый цвет неактивного текста */
+background-color: transparent; /* Прозрачный фон по умолчанию */
+text-align: left;
+white-space: nowrap;
+}
 
-  &::-webkit-scrollbar-thumb {
-    background-color: white;
-  }
+/* Стиль при наведении курсора */
+.filter__item:hover {
+background-color: rgba(255, 255, 255, 0.15); /* Легкий полупрозрачный блок при наведении мышкой */
+color: #FFFFFF;
+}
+
+/*  СТИЛЬ ВЫБРАННОГО ЭЛЕМЕНТА: ТОЛЬКО ТЕКСТ */
+.filter__item.selected {
+/* background-color: none; или просто не указываем его */
+color: #B672FF; /* Фиолетовый цвет текста (как в активных кнопках) */
+font-weight: 400; /* Жирный шрифт для акцента */
+}
+
+/* Опционально: если навести на уже выбранный элемент */
+.filter__item.selected:hover {
+background-color: rgba(182, 114, 255, 0.2); /* Очень легкий оттенок фиолетового, если нужно */
+color: #FFFFFF; /* Или оставить фиолетовый, зависит от дизайна */
 }
 
 .active {
-  color: #B672FF;
-  border-color: #B672FF;
+color: #B672FF;
+border-color: #B672FF;
 }
-
-/* .filter__count {
-  width: 26px;
-  height: 25.5px;
-  color: #FFFFFF;
-  background-color: #AD61FF;
-  font-size: 13px;
-  border-radius: 50%;
-  text-align: center;
-  position: absolute;
-  top: -9px;
-  right: -8px;
-} */

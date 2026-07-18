@@ -3,12 +3,17 @@
 import styles from "./search.module.css";
 import { useState } from "react";
 
+interface SearchProps {
+  onSearchChange: (query: string) => void;
+}
 
-export default function Search() {
+export default function Search({ onSearchChange }: SearchProps) {
   const [searchInput, setSearchInput] = useState('');
 
   const onSearchInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchInput(e.target.value);
+    const value = e.target.value;
+    setSearchInput(value);
+    onSearchChange(value.toLowerCase());
   }
 
   return (
