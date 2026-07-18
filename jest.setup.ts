@@ -12,9 +12,3 @@ Object.defineProperty(window, 'localStorage', {
   value: localStorageMock,
   writable: true,
 });
-
-
-
-
-
-// import '@testing-library/jest-dom';

@@ -19,13 +19,10 @@ describe('Search component', () => {
 
     const input = screen.getByPlaceholderText('Поиск');
     
-    // Сначала вводим что-то
     fireEvent.change(input, { target: { value: 'Test' } });
     
-    // Очищаем поле
     fireEvent.change(input, { target: { value: '' } });
 
-    // Увеличили время ожидания для debounce (стандарт 500-1000мс)
     await new Promise(resolve => setTimeout(resolve, 1000));
 
     expect(mockOnSearchChange).toHaveBeenCalledWith('');

@@ -27,7 +27,7 @@ export default function NotFound() {
           </div>
 
           <div className={styles.centerblock__container}>
-            <Search />
+            <Search onSearchChange={() => {}} />
             <div className={styles.not_found__wrapper}>
               <div className={styles.not_found__container}>
                 <div className={styles.not_found__error}>404</div>

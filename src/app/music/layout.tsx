@@ -5,7 +5,7 @@ import styles from './layout.module.css';
 import Bar from '@/components/Bar/Bar';
 import Navigation from '@/components/Navigation/Navigation';
 import Sidebar from '@/components/Sidebar/Sidebar';
-import { useFetchTracks } from '@/hooks/useFetchTracks'; // Импортируем хук
+import { useFetchTracks } from '@/hooks/useFetchTracks'; 
 import { useInitAuth } from '@/hooks/useInitAuth';
 
 interface MusicLayoutProps {

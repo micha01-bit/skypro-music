@@ -14,11 +14,9 @@ export const useFavoriteTracks = (accessToken: string | null) => {
   const [error, setError] = useState<string | null>(null);
   const dispatch = useAppDispatch();
   const { refresh } = useAppSelector((state) => state.auth);
-  // Берём текущее состояние из Redux
   const reduxFavoriteTracks = useAppSelector((state) => state.tracks.favoriteTracks);
 
   useEffect(() => {
-    // Синхронизируем локальное состояние с Redux при любом изменении
     setLocalFavoriteTracks(reduxFavoriteTracks);
   }, [reduxFavoriteTracks]);
 

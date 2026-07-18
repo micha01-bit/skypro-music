@@ -20,10 +20,8 @@ export const useLikeTrack = (track: TrackType | null): returnTypeHook => {
   const { access, refresh } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
 
-  // Реф для блокировки повторных кликов
   const isProcessing = useRef(false);
 
-  // Безопасная проверка типа favoriteTracks
   const isLike = Array.isArray(favoriteTracks)
     ? favoriteTracks.some((t) => t._id === track?._id)
     : false;
@@ -32,7 +30,6 @@ export const useLikeTrack = (track: TrackType | null): returnTypeHook => {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const toggleLike = async () => {
-    // Блокируем повторные клики во время обработки
     if (isProcessing.current || isLoading) return;
     isProcessing.current = true;
     setIsLoading(true);

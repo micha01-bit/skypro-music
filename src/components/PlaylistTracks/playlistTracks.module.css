@@ -12,12 +12,12 @@
 } 
 
 .content__playlist::-webkit-scrollbar {
-  display: none; /* Для Chrome, Safari, Edge */
+  display: none; 
 }
 
 .content__playlist {
-  -ms-overflow-style: none;  /* Для IE и Edge */
-  scrollbar-width: none;    /* Для Firefox */
+  -ms-overflow-style: none;  
+  scrollbar-width: none;    
 } 
  
 .errorContainer {
@@ -34,4 +34,4 @@
   font-size: 18px;
   line-height: 24px;
   color: #cd9fff;
-}
+} 

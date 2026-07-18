@@ -1,6 +1,6 @@
 'use client';
 
-import { authUser, getToken } from '@/app/services/auth/authApi';
+import { getToken } from '@/app/services/auth/authApi';
 import styles from './signin.module.css';
 import classNames from 'classnames';
 import Link from 'next/link';
@@ -17,7 +17,7 @@ export default function Signin() {
   const [isLoading, setIsLoading] = useState(false);
 
   const router = useRouter();
-  const dispatch = useAppDispatch(); // Добавляем dispatch
+  const dispatch = useAppDispatch();
 
   const onChangeEmail = (e: ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
@@ -40,16 +40,7 @@ export default function Signin() {
     setIsLoading(true);
 
     try {
-      // Авторизоваться
-      const authResp = await authUser({ email, password });
 
-      // Сохраняем username в Redux store
-      // dispatch(setUsername(authResp.data.username));
-
-      // localStorage.setItem("userId", String(authResp.data._id));
-
-
-      // Получить время получения токена в секундах и записать в LS
       const tokenGetTime = String(new Date().getTime() / 1000);
       localStorage.setItem("tokenGetTime", tokenGetTime);
 

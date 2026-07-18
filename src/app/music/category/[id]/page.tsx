@@ -1,12 +1,12 @@
 'use client';
 
-import { useParams } from "next/navigation";
+import { useParams } from 'next/navigation';
 import Centerblock from '@/components/Centerblock/Centerblock';
 import { useEffect, useState } from 'react';
-import { getTracks, getCategoryTracks } from '@/app/services/tracks/trackApi';
+import { getCategoryTracks } from '@/app/services/tracks/trackApi';
 import { TrackType, CategoryType } from '@/sharedTypes/sharedTypes';
 import { AxiosError } from 'axios';
-import { useAppSelector } from "@/store/store";
+import { useAppSelector } from '@/store/store';
 
 export default function CategoryPage() {
   const params = useParams<{ id: string }>();
@@ -15,52 +15,45 @@ export default function CategoryPage() {
   const { fetchIsLoading, allTracks, fetchError } = useAppSelector((state) => state.tracks);
 
   const [categoryTracks, setCategoryTracks] = useState<TrackType[]>([]);
-  const [categoryName, setCategoryName] = useState("");
+  const [categoryName, setCategoryName] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    console.log('CategoryPage: useEffect вызван, id:', params.id);
     setIsLoading(true);
 
-    if (!fetchIsLoading && allTracks.length && params.id) {
-      getCategoryTracks(params.id)
-        .then((res: CategoryType) => {
-          console.log("Результат запроса категории:", res);
-          const itemsId = res.items; // Массив ID треков
-          console.log("ID треков категории:", itemsId);
-
-          setCategoryName(res.name);
-          console.log("Название категории:", res.name);
-
-          // Фильтруем все треки по ID из категории
-          const filteredTracks = allTracks.filter((track) =>
-            itemsId.includes(track._id)
-          );
-          console.log("Отфильтрованные треки:", filteredTracks);
-
-          setCategoryTracks(filteredTracks);
-        })
-        .catch((error) => {
-          if (error instanceof AxiosError) {
-            if (error.response) {
-              setError(error.response.data?.message || 'Ошибка сервера');
-            } else if (error.request) {
-              setError("Отсутствует интернет");
-            } else {
-              setError("Неизвестная ошибка");
-            }
-          } else {
-            setError("Произошла непредвиденная ошибка");
-          }
-        })
-        .finally(() => {
-          setIsLoading(false);
-        });
-    } else {
+    if (!params.id || fetchIsLoading || !allTracks.length) {
       setIsLoading(false);
+      return;
     }
-  }, [fetchIsLoading, allTracks, params.id]); // Убрали tracks из зависимостей
+
+    getCategoryTracks(params.id)
+      .then((res: CategoryType) => {
+        setCategoryName(res.name);
+
+        const categoryIdsAsStrings = res.items.map((id) => String(id));
+
+        const filteredTracks = allTracks.filter((track) =>
+          categoryIdsAsStrings.includes(String(track._id))
+        );
+
+        setCategoryTracks(filteredTracks);
+      })
+      .catch((error) => {
+        if (error instanceof AxiosError) {
+          if (error.response) {
+            setError(error.response.data?.message || 'Ошибка сервера');
+          } else {
+            setError('Отсутствует интернет');
+          }
+        } else {
+          setError('Произошла непредвиденная ошибка');
+        }
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, [fetchIsLoading, allTracks, params.id]);
 
   return (
     <>

@@ -11,16 +11,13 @@ const mockTracks: TrackType[] = [
 
 describe('FilterItem component', () => {
   it('should open dropdown on button click', async () => {
-    // 1. Создаем начальное состояние
+    
     let isOpen = false;
     
-    // Функция, которую мы передадим в onClick. 
-    // В реальном приложении она меняет стейт родителя.
     const handleClick = () => {
       isOpen = !isOpen;
     };
 
-    // Рендерим компонент с начальным состоянием (закрыт)
     const { rerender } = render(
       <FilterItem 
         title="исполнителю" 
@@ -34,25 +31,19 @@ describe('FilterItem component', () => {
 
     const button = screen.getByText('исполнителю');
     
-    // Делаем клик. 
-    // ВАЖНО: Клик только вызывает handleClick, который меняет переменную isOpen.
-    // Сам компонент еще не обновился!
     await fireEvent.click(button);
 
-    // 2. ЭМУЛИРУЕМ ОБНОВЛЕНИЕ РОДИТЕЛЯ:
-    // Вызываем rerender с НОВЫМ значением isOpen (которое мы изменили в handleClick)
     rerender(
       <FilterItem 
         title="исполнителю" 
         onClick={handleClick} 
-        isOpen={isOpen} // Теперь тут true!
+        isOpen={isOpen}
         currentValues={[]} 
         onSelect={jest.fn()} 
         playlist={mockTracks} 
       />
     );
 
-    // Теперь ждем, пока появится список (он появится, потому что isOpen=true)
     await waitFor(() => {
       expect(screen.getByTestId('filter-list')).toBeInTheDocument();
     });
@@ -99,7 +90,6 @@ describe('FilterItem component', () => {
     const listContainer = screen.getByTestId('filter-list');
     const selectedOption = await within(listContainer).findByText('Artist A');
     
-    // Проверка класса для CSS Modules
     expect(selectedOption.className).toContain('selected');
   });
 });
