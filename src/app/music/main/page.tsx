@@ -14,7 +14,6 @@ export default function Home() {
   const isAuthRequired = false;
 
   useEffect(() => {
-    // Загружаем избранные треки из localStorage при монтировании
     const savedFavorites = localStorage.getItem('favoriteTracks');
     if (savedFavorites) {
       try {

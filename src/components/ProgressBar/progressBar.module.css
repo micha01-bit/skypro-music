@@ -42,7 +42,6 @@
    box-shadow: -100vmax 0 0 100vmax var(--progress-color);
 }
 
-/* Firefox */
 .styledProgressInput::-moz-range-track {
    width: 100%;
    height: var(--progress-height);
@@ -57,7 +56,6 @@
    border: none;
 }
 
-/* Заполнение прогресса в Firefox */
 .styledProgressInput::-moz-range-progress {
    background-color: var(--progress-color);
    height: var(--progress-height);
