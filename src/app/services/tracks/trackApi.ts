@@ -6,7 +6,6 @@ export const getTracks = (): Promise<TrackType[]> => {
   return axios.get(BASE_URL + '/catalog/track/all/')
     .then((res) => res.data.data as TrackType[])
     .catch((error) => {
-      console.error("Ошибка при получении всех треков: ", error);
       throw error;
     });
 };
@@ -15,7 +14,6 @@ export const getCategoryTracks = (trackId: string): Promise<CategoryType> => {
   return axios.get(BASE_URL + `/catalog/selection/${trackId}/`)
     .then((res) => res.data.data as CategoryType)
     .catch((error) => {
-      console.error(`Ошибка при получении категории треков (ID: ${trackId}): `, error);
       throw error;
     });
 };
@@ -29,12 +27,10 @@ export const getFavoriteTrackIds = async (access: string): Promise<number[]> => 
     });
     return resp.data.data as number[];
   } catch (error) {
-    console.error("Ошибка при получении ID треков 'Избранное': ", error);
     throw error;
   }
 };
 
-// Изменён тип возврата: вместо FavoriteType используем TrackType[]
 export const getFavoriteTracks = async (access: string): Promise<TrackType[]> => {
   try {
     const resp = await axios.get(BASE_URL + `/catalog/track/favorite/all/`, {
@@ -44,12 +40,11 @@ export const getFavoriteTracks = async (access: string): Promise<TrackType[]> =>
     });
     return resp.data.data as TrackType[];
   } catch (error) {
-    console.error("Ошибка при получении треков 'Избранное': ", error);
     throw error;
   }
 };
 
-export const addTrackToFavorite = async (trackId: number, accessToken: string): Promise<void> => {
+export const addTrackToFavorite = async (trackId: string, accessToken: string): Promise<void> => {
   try {
     await axios.post(BASE_URL + `/catalog/track/${trackId}/favorite/`, {}, {
       headers: {
@@ -57,12 +52,11 @@ export const addTrackToFavorite = async (trackId: number, accessToken: string): 
       }
     });
   } catch (error) {
-    console.error("Ошибка при добавлении трека в избранное: ", error);
     throw error;
   }
 };
 
-export const deleteTrackFromFavorite = async (trackId: number, accessToken: string): Promise<void> => {
+export const deleteTrackFromFavorite = async (trackId: string, accessToken: string): Promise<void> => {
   try {
     await axios.delete(BASE_URL + `/catalog/track/${trackId}/favorite/`, {
       headers: {
@@ -70,7 +64,6 @@ export const deleteTrackFromFavorite = async (trackId: number, accessToken: stri
       }
     });
   } catch (error) {
-    console.error("Ошибка при удалении трека из избранного: ", error);
     throw error;
   }
 };

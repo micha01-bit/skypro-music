@@ -14,8 +14,7 @@ type PlaylistTracksProp = {
 
 
 export default function PlaylistTracks({ playlist, isLoading, error, isAuthRequired }: PlaylistTracksProp) { 
-  // console.log("data в PlaylistTracks: ", playlist);
-  // console.log("data в isLoading: ", isLoading);
+  
   const isAccessToken = useAppSelector((state) => state.auth.access); 
 
   return (

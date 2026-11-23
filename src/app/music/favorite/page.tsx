@@ -8,11 +8,10 @@ export default function FavoritePage() {
   const { access } = useAppSelector((state) => state.auth);
   const { favoriteTracks, isLoading, error } = useFavoriteTracks(access);
 
-  // Фильтруем треки: убираем null/undefined и дубликаты по _id
   const filteredTracks = favoriteTracks
-    .filter(track => track && track._id) // проверяем, что трек существует и имеет _id
+    .filter(track => track && track._id) 
     .filter((track, index, array) =>
-      array.findIndex(t => t._id === track._id) === index // убираем дубликаты
+      array.findIndex(t => t._id === track._id) === index 
     );
 
   return (

@@ -16,8 +16,7 @@ type trackTypeProp = {
 }
 
 export default function PlaylistTrack({ track, playlist }: trackTypeProp) {
-  const dispatch = useAppDispatch(); 
-  // console.log("track: ", track); 
+  const dispatch = useAppDispatch();  
 
   const isAccessToken = useAppSelector((state) => state.auth.access);
 
@@ -26,14 +25,11 @@ export default function PlaylistTrack({ track, playlist }: trackTypeProp) {
 
   // получить текущий трек
   const currentTrack = useAppSelector((state) => state.tracks.currentTrack);
-  // console.log("currentTrack в PlaylistTrack: ", currentTrack);
 
   const currentTrackId = useAppSelector((state) => state.tracks.currentTrack?._id)
-  // console.log("currentTrackId в PlaylistTrack: ", currentTrackId);
-
+  
   // проверить, что текущий трек играет
   const currentTrackIsPlay = useAppSelector((state) => state.tracks.isPlay);
-  // console.log("currentTrackIsPlay в PlaylistTrack: ", currentTrackIsPlay);
 
 
   const onClickTrack = () => {
